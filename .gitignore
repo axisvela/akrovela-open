@@ -1,0 +1,7 @@
+/build/
+/dist/
+.env
+*.log
+*.exe
+__pycache__/
+.superpowers/

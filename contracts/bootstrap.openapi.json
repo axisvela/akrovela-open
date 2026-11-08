@@ -1,0 +1,34 @@
+{
+  "openapi": "3.1.0",
+  "info": {"title": "AKROVELA Bootstrap API", "version": "0.1.0", "description": "Local operational endpoints only; no execution API."},
+  "paths": {
+    "/healthz": {"get": {"operationId": "health", "responses": {
+      "200": {"description": "Process live", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Health"}}}},
+      "405": {"$ref": "#/components/responses/MethodNotAllowed"}
+    }}},
+    "/readyz": {"get": {"operationId": "readiness", "responses": {
+      "200": {"description": "PostgreSQL and bootstrap schema available, not domain readiness", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Ready"}}}},
+      "503": {"description": "Database or schema unavailable", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+      "405": {"$ref": "#/components/responses/MethodNotAllowed"}
+    }}},
+    "/version": {"get": {"operationId": "version", "responses": {
+      "200": {"description": "Product version", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Version"}}}},
+      "405": {"$ref": "#/components/responses/MethodNotAllowed"}
+    }}}
+  },
+  "components": {
+    "responses": {
+      "MethodNotAllowed": {"description": "GET required; Allow: GET", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
+    },
+    "schemas": {
+      "Health": {"type": "object", "additionalProperties": false, "required": ["status"], "properties": {"status": {"const": "ok"}}},
+      "Ready": {"type": "object", "additionalProperties": false, "required": ["status"], "properties": {"status": {"const": "ready"}}},
+      "Version": {"type": "object", "additionalProperties": false, "required": ["product", "version", "stage"], "properties": {
+        "product": {"const": "AKROVELA"}, "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"}, "stage": {"const": "bootstrap"}
+      }},
+      "Error": {"type": "object", "additionalProperties": false, "required": ["error"], "properties": {
+        "error": {"type": "object", "additionalProperties": false, "required": ["code", "message"], "properties": {"code": {"enum": ["not_ready", "not_found", "method_not_allowed"]}, "message": {"type": "string"}}}
+      }}
+    }
+  }
+}
