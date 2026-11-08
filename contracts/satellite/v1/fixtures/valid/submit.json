@@ -19,6 +19,14 @@
     "operation_type": "ros2.nav2.navigate_to_pose@1",
     "payload_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "binding_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "payload": {
+      "goal": {"x": 12.4, "y": -3.1, "yaw": 1.5708, "frame_id": "map"},
+      "position_tolerance_m": 0.25,
+      "yaw_tolerance_rad": 0.15,
+      "behavior_tree": "navigate_to_pose_w_replanning_and_recovery.xml",
+      "planner_id": "GridBased",
+      "controller_id": "FollowPath"
+    },
     "target": {
       "node_id": "akrovela-node-wh3-01",
       "node_boot_epoch": 7,

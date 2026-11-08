@@ -86,12 +86,35 @@
         "max_payload_bytes": {"type": "integer", "minimum": 1, "maximum": 1048576}
       }
     },
+    "NavigatePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goal", "position_tolerance_m", "yaw_tolerance_rad", "behavior_tree", "planner_id", "controller_id"],
+      "properties": {
+        "goal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["x", "y", "yaw", "frame_id"],
+          "properties": {
+            "x": {"type": "number"},
+            "y": {"type": "number"},
+            "yaw": {"type": "number"},
+            "frame_id": {"type": "string", "pattern": "^[A-Za-z0-9._/-]+$"}
+          }
+        },
+        "position_tolerance_m": {"type": "number", "minimum": 0, "maximum": 10},
+        "yaw_tolerance_rad": {"type": "number", "minimum": 0, "maximum": 3.15},
+        "behavior_tree": {"const": "navigate_to_pose_w_replanning_and_recovery.xml"},
+        "planner_id": {"const": "GridBased"},
+        "controller_id": {"const": "FollowPath"}
+      }
+    },
     "SubmitBody": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "operation_key", "attempt_id", "operation_type", "payload_digest",
-        "binding_digest", "target", "mission_ref", "assignment_ref", "lease_ref",
+        "binding_digest", "payload", "target", "mission_ref", "assignment_ref", "lease_ref",
         "fencing_token", "safety_envelope_ref", "authority_ref", "approval_ref",
         "validity", "resource_limits", "observation_refs",
         "idempotency_retention_seconds", "dispatch_not_after", "contract_mode"
@@ -102,6 +125,7 @@
         "operation_type": {"const": "ros2.nav2.navigate_to_pose@1"},
         "payload_digest": {"$ref": "#/$defs/Digest"},
         "binding_digest": {"$ref": "#/$defs/Digest"},
+        "payload": {"$ref": "#/$defs/NavigatePayload"},
         "target": {"$ref": "#/$defs/Target"},
         "mission_ref": {"type": "string", "pattern": "^mission:[A-Za-z0-9._~:/-]+$"},
         "assignment_ref": {"type": "string", "pattern": "^assignment:[A-Za-z0-9._~:/-]+$"},
