@@ -1,0 +1,716 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AKROVELA Local Operation API",
+    "version": "0.1.0",
+    "x-contract-version": "v1",
+    "x-contract-status": "reviewed",
+    "x-review-ref": "review.md",
+    "description": "Versioned local operation and receipt contract. It binds admission, execution, cancellation and verified effect as separate facts. It does not grant Mission authority, does not expose a shell, and does not make a ROS topic, action result or simulation fact authoritative."
+  },
+  "servers": [
+    {"url": "http://127.0.0.1:2046", "description": "Local development"}
+  ],
+  "security": [
+    {"bearerAuth": []}
+  ],
+  "tags": [
+    {"name": "operations", "description": "Local operation admission, query, cancellation and receipts"}
+  ],
+  "paths": {
+    "/v1/operations": {
+      "post": {
+        "tags": ["operations"],
+        "operationId": "submitOperation",
+        "summary": "Submit one bounded local operation",
+        "description": "Persists admission before acknowledging. Reusing an operation key with the same payload and binding digests returns the existing operation; a different payload or binding rejects. An accepted submit is not an execution start, completion or verified effect.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/SubmitOperationRequest"}
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Operation persisted; execution is not implied",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/OperationView"}
+              }
+            }
+          },
+          "200": {
+            "description": "Idempotent replay of an existing operation",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/OperationView"}
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "409": {"$ref": "#/components/responses/Conflict"},
+          "422": {"$ref": "#/components/responses/Unprocessable"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/v1/operations/{operation_key}": {
+      "get": {
+        "tags": ["operations"],
+        "operationId": "queryOperation",
+        "summary": "Query authoritative local operation state",
+        "description": "Returns persisted admission, attempts, execution, cancellation and effect state. Unknown remains unknown; it is not converted into success or failure.",
+        "parameters": [
+          {"$ref": "#/components/parameters/OperationKey"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Authoritative local operation view",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/OperationView"}
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/v1/operations/{operation_key}/cancel": {
+      "post": {
+        "tags": ["operations"],
+        "operationId": "requestCancel",
+        "summary": "Request cancellation; the response is not a stop",
+        "description": "Records a cancellation request with its own identity. stop_confirmed is true only when a separate safety authority or independent observation confirms a stop. ROS action termination is an execution fact, not stop confirmation.",
+        "parameters": [
+          {"$ref": "#/components/parameters/OperationKey"}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/CancelRequest"}
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Cancellation request recorded or replayed; the stop is separate",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/CancelResponse"}
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "409": {"$ref": "#/components/responses/Conflict"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/v1/operations/{operation_key}/receipts": {
+      "get": {
+        "tags": ["operations"],
+        "operationId": "listReceipts",
+        "summary": "List append-only receipts for an operation",
+        "description": "Receipts are append-only and delivered at least once. Consumers deduplicate by receipt_id. Recovery and repair append evidence and never rewrite an original receipt or re-execute the effect.",
+        "parameters": [
+          {"$ref": "#/components/parameters/OperationKey"},
+          {"$ref": "#/components/parameters/AfterSequence"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Receipt page",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ReceiptList"}
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    },
+    "/v1/receipts/{receipt_id}": {
+      "get": {
+        "tags": ["operations"],
+        "operationId": "getReceipt",
+        "summary": "Get one immutable receipt",
+        "parameters": [
+          {"$ref": "#/components/parameters/ReceiptId"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Immutable receipt",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Receipt"}
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "503": {"$ref": "#/components/responses/Unavailable"}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Authenticated principal. Scope in the body is checked against the authenticated tenant/workspace/site."
+      }
+    },
+    "parameters": {
+      "OperationKey": {
+        "name": "operation_key",
+        "in": "path",
+        "required": true,
+        "schema": {"$ref": "#/components/schemas/OperationKey"}
+      },
+      "ReceiptId": {
+        "name": "receipt_id",
+        "in": "path",
+        "required": true,
+        "schema": {"$ref": "#/components/schemas/ReceiptId"}
+      },
+      "AfterSequence": {
+        "name": "after_sequence",
+        "in": "query",
+        "required": false,
+        "schema": {"type": "integer", "minimum": 0}
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Malformed or invalid request",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+      },
+      "Unauthorized": {
+        "description": "Missing or expired authentication",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+      },
+      "Forbidden": {
+        "description": "Authenticated principal is not allowed for this scope",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+      },
+      "NotFound": {
+        "description": "Operation or receipt not found in the authenticated scope",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+      },
+      "Conflict": {
+        "description": "Operation key, state or cancellation conflict",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+      },
+      "Unprocessable": {
+        "description": "Well-formed request rejected by authority, validity, fence or safety checks",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+      },
+      "Unavailable": {
+        "description": "Required dependency unavailable; new dependent work is not admitted",
+        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+      }
+    },
+    "schemas": {
+      "OperationKey": {
+        "type": "string",
+        "pattern": "^op:[A-Za-z0-9._~-]+$",
+        "description": "URL-safe stable operation key. It must not contain a slash."
+      },
+      "ReceiptId": {
+        "type": "string",
+        "pattern": "^receipt:[A-Za-z0-9._~-]+$"
+      },
+      "AttemptId": {
+        "type": "string",
+        "pattern": "^attempt:[A-Za-z0-9._~-]+$"
+      },
+      "CancelRequestId": {
+        "type": "string",
+        "pattern": "^cancel:[A-Za-z0-9._~-]+$"
+      },
+      "ObservationId": {
+        "type": "string",
+        "pattern": "^obs:[A-Za-z0-9._~-]+$"
+      },
+      "Digest": {
+        "type": "string",
+        "pattern": "^sha256:[a-f0-9]{64}$",
+        "description": "SHA-256 over RFC 8785 JSON Canonicalization Scheme of the declared digest object. The server recomputes and rejects a mismatch."
+      },
+      "Scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tenant_id", "workspace_id", "site_id"],
+        "properties": {
+          "tenant_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+          "workspace_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+          "site_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"}
+        }
+      },
+      "Target": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["node_id", "node_boot_epoch", "robot_ref", "adapter", "adapter_version", "map_ref", "frame_id"],
+        "properties": {
+          "node_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+          "node_boot_epoch": {"type": "integer", "minimum": 1},
+          "robot_ref": {"type": "string", "pattern": "^robot:[A-Za-z0-9._~:/-]+$"},
+          "adapter": {"const": "ros2-nav2"},
+          "adapter_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+          "map_ref": {"type": "string", "pattern": "^map:[A-Za-z0-9._~:/-]+@sha256:[a-f0-9]{64}$"},
+          "frame_id": {"type": "string", "pattern": "^[A-Za-z0-9._/-]+$"}
+        }
+      },
+      "Validity": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["not_before", "expires_at", "clock_domain", "max_clock_skew_ms", "revalidate_at_release"],
+        "properties": {
+          "not_before": {"type": "string", "format": "date-time"},
+          "expires_at": {"type": "string", "format": "date-time"},
+          "clock_domain": {"const": "authority-utc"},
+          "max_clock_skew_ms": {"type": "integer", "minimum": 0, "maximum": 60000},
+          "revalidate_at_release": {"const": true}
+        }
+      },
+      "ResourceLimits": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["max_duration_ms", "max_goal_distance_m", "max_path_length_m", "max_speed_mps", "max_attempts", "max_retries", "max_payload_bytes"],
+        "properties": {
+          "max_duration_ms": {"type": "integer", "minimum": 1, "maximum": 3600000},
+          "max_goal_distance_m": {"type": "number", "minimum": 0, "maximum": 10000},
+          "max_path_length_m": {"type": "number", "minimum": 0, "maximum": 100000},
+          "max_speed_mps": {"type": "number", "minimum": 0, "maximum": 10},
+          "max_attempts": {"type": "integer", "minimum": 1, "maximum": 10},
+          "max_retries": {"type": "integer", "minimum": 0, "maximum": 10},
+          "max_payload_bytes": {"type": "integer", "minimum": 1, "maximum": 1048576}
+        }
+      },
+      "ObservationSubject": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["robot_ref", "operation_key", "attempt_id", "execution_epoch", "map_ref", "target_digest"],
+        "properties": {
+          "robot_ref": {"type": "string", "pattern": "^robot:[A-Za-z0-9._~:/-]+$"},
+          "operation_key": {"$ref": "#/components/schemas/OperationKey"},
+          "attempt_id": {"$ref": "#/components/schemas/AttemptId"},
+          "execution_epoch": {"type": "integer", "minimum": 1},
+          "map_ref": {"type": "string", "pattern": "^map:[A-Za-z0-9._~:/-]+@sha256:[a-f0-9]{64}$"},
+          "target_digest": {"$ref": "#/components/schemas/Digest"}
+        }
+      },
+      "ObservationReference": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["observation_id", "source_id", "trust_domain", "state_label", "clock_domain", "seq", "observed_at", "received_at", "digest", "freshness_decision"],
+        "properties": {
+          "observation_id": {"$ref": "#/components/schemas/ObservationId"},
+          "source_id": {"type": "string", "minLength": 1},
+          "trust_domain": {"type": "string", "minLength": 1},
+          "state_label": {"enum": ["observed", "replayed", "synthetic", "simulated", "predicted", "derived"]},
+          "clock_domain": {"type": "string", "minLength": 1},
+          "source_epoch": {"type": "integer", "minimum": 1},
+          "seq": {"type": "integer", "minimum": 0},
+          "observed_at": {"type": "string", "format": "date-time"},
+          "received_at": {"type": "string", "format": "date-time"},
+          "max_age_ms": {"type": "integer", "minimum": 0},
+          "max_clock_skew_ms": {"type": "integer", "minimum": 0, "maximum": 60000},
+          "freshness_decision": {"enum": ["accepted", "stale", "replayed", "wrong_subject", "wrong_source", "unknown"]},
+          "subject": {"$ref": "#/components/schemas/ObservationSubject"},
+          "digest": {"$ref": "#/components/schemas/Digest"}
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {"freshness_decision": {"const": "accepted"}},
+              "required": ["freshness_decision"]
+            },
+            "then": {
+              "required": ["subject", "max_age_ms", "max_clock_skew_ms", "source_epoch"]
+            }
+          }
+        ]
+      },
+      "NavigateToPosePayload": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["goal", "position_tolerance_m", "yaw_tolerance_rad", "behavior_tree", "planner_id", "controller_id"],
+        "properties": {
+          "goal": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["x", "y", "yaw", "frame_id"],
+            "properties": {
+              "x": {"type": "number"},
+              "y": {"type": "number"},
+              "yaw": {"type": "number"},
+              "frame_id": {"type": "string", "pattern": "^[A-Za-z0-9._/-]+$"}
+            }
+          },
+          "position_tolerance_m": {"type": "number", "minimum": 0, "maximum": 10},
+          "yaw_tolerance_rad": {"type": "number", "minimum": 0, "maximum": 3.15},
+          "behavior_tree": {"const": "navigate_to_pose_w_replanning_and_recovery.xml"},
+          "planner_id": {"const": "GridBased"},
+          "controller_id": {"const": "FollowPath"}
+        }
+      },
+      "SubmitOperationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "protocol_version", "operation_key", "operation_type",
+          "payload_digest", "binding_digest", "payload", "scope", "target",
+          "mission_ref", "assignment_ref", "lease_ref", "fencing_token",
+          "safety_envelope_ref", "authority_ref", "approval_ref", "validity",
+          "resource_limits", "observation_refs", "idempotency_retention_seconds"
+        ],
+        "properties": {
+          "protocol_version": {"const": "akrovela.local-operation/v1"},
+          "operation_key": {"$ref": "#/components/schemas/OperationKey"},
+          "operation_type": {"const": "ros2.nav2.navigate_to_pose@1"},
+          "payload_digest": {"description": "SHA-256 over RFC 8785 JCS of {operation_type, payload}.", "$ref": "#/components/schemas/Digest"},
+          "binding_digest": {"description": "SHA-256 over RFC 8785 JCS of {scope, target, mission_ref, assignment_ref, lease_ref, fencing_token, safety_envelope_ref, authority_ref, approval_ref, validity}.", "$ref": "#/components/schemas/Digest"},
+          "payload": {"$ref": "#/components/schemas/NavigateToPosePayload"},
+          "scope": {"$ref": "#/components/schemas/Scope"},
+          "target": {"$ref": "#/components/schemas/Target"},
+          "mission_ref": {"type": "string", "pattern": "^mission:[A-Za-z0-9._~:/-]+$"},
+          "assignment_ref": {"type": "string", "pattern": "^assignment:[A-Za-z0-9._~:/-]+$"},
+          "lease_ref": {"type": "string", "pattern": "^lease:[A-Za-z0-9._~:/-]+$"},
+          "fencing_token": {"type": "integer", "minimum": 1},
+          "safety_envelope_ref": {"type": "string", "pattern": "^safe:[A-Za-z0-9._~:/-]+$"},
+          "authority_ref": {"type": "string", "pattern": "^grant:[A-Za-z0-9._~:/-]+$"},
+          "approval_ref": {"type": "string", "pattern": "^approval:[A-Za-z0-9._~:/-]+$"},
+          "validity": {"$ref": "#/components/schemas/Validity"},
+          "resource_limits": {"$ref": "#/components/schemas/ResourceLimits"},
+          "observation_refs": {
+            "type": "array",
+            "minItems": 0,
+            "items": {"$ref": "#/components/schemas/ObservationReference"}
+          },
+          "idempotency_retention_seconds": {"type": "integer", "minimum": 1, "maximum": 31536000}
+        }
+      },
+      "AttemptView": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["attempt_id", "node_boot_epoch", "execution_epoch", "fencing_token", "status"],
+        "properties": {
+          "attempt_id": {"$ref": "#/components/schemas/AttemptId"},
+          "node_boot_epoch": {"type": "integer", "minimum": 1},
+          "execution_epoch": {"type": "integer", "minimum": 1},
+          "fencing_token": {"type": "integer", "minimum": 1},
+          "status": {"enum": ["not_started", "started", "completed", "failed", "confirmed_no_effect", "unknown"]},
+          "started_at": {"type": "string", "format": "date-time"},
+          "completed_at": {"type": "string", "format": "date-time"},
+          "error": {"$ref": "#/components/schemas/Error"}
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {"status": {"const": "started"}},
+              "required": ["status"]
+            },
+            "then": {"required": ["started_at"]}
+          },
+          {
+            "if": {
+              "properties": {"status": {"enum": ["completed", "failed"]}},
+              "required": ["status"]
+            },
+            "then": {"required": ["started_at", "completed_at"]}
+          }
+        ]
+      },
+      "ExecutorFacts": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["adapter", "goal_id", "terminal_state", "action_terminated"],
+        "properties": {
+          "adapter": {"const": "ros2-nav2"},
+          "goal_id": {"type": "string", "minLength": 1},
+          "terminal_state": {"enum": ["SUCCEEDED", "ABORTED", "CANCELED", "UNKNOWN"]},
+          "action_terminated": {"type": "boolean"},
+          "started_at": {"type": "string", "format": "date-time"},
+          "completed_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "VerifierResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["verifier_id", "result", "evaluated_at", "independent_of_executor", "trust_domain", "shared_failure_modes", "evidence_ref"],
+        "properties": {
+          "verifier_id": {"type": "string", "minLength": 1},
+          "result": {"enum": ["verified", "rejected", "unknown"]},
+          "evaluated_at": {"type": "string", "format": "date-time"},
+          "independent_of_executor": {"type": "boolean"},
+          "trust_domain": {"type": "string", "minLength": 1},
+          "shared_failure_modes": {"type": "array", "items": {"type": "string"}},
+          "evidence_ref": {"type": "string", "minLength": 1}
+        }
+      },
+      "Receipt": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "receipt_id", "receipt_sequence", "receipt_type", "operation_key",
+          "emitted_at", "payload_digest", "binding_digest", "fencing_token",
+          "contract_mode", "admission_status", "execution_status",
+          "cancellation_status", "effect_status", "evidence_refs",
+          "receipt_digest"
+        ],
+        "properties": {
+          "receipt_id": {"$ref": "#/components/schemas/ReceiptId"},
+          "receipt_sequence": {"type": "integer", "minimum": 1},
+          "receipt_type": {"enum": ["admission", "execution", "cancellation", "evidence", "repair"]},
+          "operation_key": {"$ref": "#/components/schemas/OperationKey"},
+          "attempt_id": {"$ref": "#/components/schemas/AttemptId"},
+          "emitted_at": {"type": "string", "format": "date-time"},
+          "payload_digest": {"$ref": "#/components/schemas/Digest"},
+          "binding_digest": {"$ref": "#/components/schemas/Digest"},
+          "fencing_token": {"type": "integer", "minimum": 1},
+          "contract_mode": {"enum": ["live", "fixture"]},
+          "admission_status": {"enum": ["accepted", "rejected"]},
+          "execution_status": {"enum": ["not_started", "started", "completed", "failed", "confirmed_no_effect", "unknown"]},
+          "cancellation_status": {"enum": ["not_requested", "requested", "stop_confirmed", "rejected", "unknown"]},
+          "effect_status": {"enum": ["not_evaluated", "verified", "rejected", "unknown"]},
+          "executor_facts": {"$ref": "#/components/schemas/ExecutorFacts"},
+          "observations": {
+            "type": "array",
+            "minItems": 0,
+            "items": {"$ref": "#/components/schemas/ObservationReference"}
+          },
+          "verifier": {"$ref": "#/components/schemas/VerifierResult"},
+          "confirmation_source": {"enum": ["safety_authority", "observation"]},
+          "confirmation_ref": {"type": "string", "minLength": 1},
+          "evidence_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "error": {"$ref": "#/components/schemas/Error"},
+          "receipt_digest": {"$ref": "#/components/schemas/Digest"}
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {"receipt_type": {"enum": ["execution", "evidence", "repair"]}},
+              "required": ["receipt_type"]
+            },
+            "then": {"required": ["attempt_id", "executor_facts", "verifier", "observations"]}
+          },
+          {
+            "if": {
+              "properties": {"effect_status": {"const": "verified"}},
+              "required": ["effect_status"]
+            },
+            "then": {
+              "required": ["verifier", "observations"],
+              "properties": {
+                "verifier": {
+                  "type": "object",
+                  "required": ["result"],
+                  "properties": {"result": {"const": "verified"}}
+                },
+                "observations": {"type": "array", "minItems": 1}
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {"cancellation_status": {"const": "stop_confirmed"}},
+              "required": ["cancellation_status"]
+            },
+            "then": {"required": ["confirmation_source", "confirmation_ref"]}
+          },
+          {
+            "if": {
+              "properties": {
+                "contract_mode": {"const": "live"},
+                "effect_status": {"const": "verified"}
+              },
+              "required": ["contract_mode", "effect_status"]
+            },
+            "then": {
+              "properties": {
+                "observations": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "state_label": {"enum": ["observed", "replayed", "synthetic", "predicted", "derived"]}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ReceiptList": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["receipts", "next_after_sequence"],
+        "properties": {
+          "receipts": {"type": "array", "items": {"$ref": "#/components/schemas/Receipt"}},
+          "next_after_sequence": {"type": "integer", "minimum": 0, "description": "Pass as after_sequence on the next request. An empty receipts array means no further page is currently retained."}
+        }
+      },
+      "OperationView": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "protocol_version", "operation_key", "operation_type",
+          "payload_digest", "binding_digest", "payload", "observation_refs",
+          "idempotency_retention_seconds", "scope", "target", "mission_ref",
+          "assignment_ref", "lease_ref", "fencing_token", "safety_envelope_ref",
+          "authority_ref", "approval_ref", "validity", "resource_limits",
+          "admission_status", "execution_status", "cancellation_status",
+          "effect_status", "attempts", "contract_mode", "created_at", "updated_at"
+        ],
+        "properties": {
+          "protocol_version": {"const": "akrovela.local-operation/v1"},
+          "operation_key": {"$ref": "#/components/schemas/OperationKey"},
+          "operation_type": {"const": "ros2.nav2.navigate_to_pose@1"},
+          "payload_digest": {"$ref": "#/components/schemas/Digest"},
+          "binding_digest": {"$ref": "#/components/schemas/Digest"},
+          "payload": {"$ref": "#/components/schemas/NavigateToPosePayload"},
+          "observation_refs": {
+            "type": "array",
+            "minItems": 0,
+            "items": {"$ref": "#/components/schemas/ObservationReference"}
+          },
+          "idempotency_retention_seconds": {"type": "integer", "minimum": 1, "maximum": 31536000},
+          "scope": {"$ref": "#/components/schemas/Scope"},
+          "target": {"$ref": "#/components/schemas/Target"},
+          "mission_ref": {"type": "string", "pattern": "^mission:[A-Za-z0-9._~:/-]+$"},
+          "assignment_ref": {"type": "string", "pattern": "^assignment:[A-Za-z0-9._~:/-]+$"},
+          "lease_ref": {"type": "string", "pattern": "^lease:[A-Za-z0-9._~:/-]+$"},
+          "fencing_token": {"type": "integer", "minimum": 1},
+          "safety_envelope_ref": {"type": "string", "pattern": "^safe:[A-Za-z0-9._~:/-]+$"},
+          "authority_ref": {"type": "string", "pattern": "^grant:[A-Za-z0-9._~:/-]+$"},
+          "approval_ref": {"type": "string", "pattern": "^approval:[A-Za-z0-9._~:/-]+$"},
+          "validity": {"$ref": "#/components/schemas/Validity"},
+          "resource_limits": {"$ref": "#/components/schemas/ResourceLimits"},
+          "admission_status": {"enum": ["accepted", "rejected"]},
+          "execution_status": {"enum": ["not_started", "started", "completed", "failed", "confirmed_no_effect", "unknown"]},
+          "cancellation_status": {"enum": ["not_requested", "requested", "stop_confirmed", "rejected", "unknown"]},
+          "effect_status": {"enum": ["not_evaluated", "verified", "rejected", "unknown"]},
+          "confirmation_source": {"enum": ["safety_authority", "observation"]},
+          "confirmation_ref": {"type": "string", "minLength": 1},
+          "attempts": {"type": "array", "items": {"$ref": "#/components/schemas/AttemptView"}},
+          "latest_receipt": {"$ref": "#/components/schemas/Receipt"},
+          "contract_mode": {"enum": ["live", "fixture"]},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {"effect_status": {"const": "verified"}},
+              "required": ["effect_status"]
+            },
+            "then": {"required": ["latest_receipt"]}
+          },
+          {
+            "if": {
+              "properties": {"cancellation_status": {"const": "stop_confirmed"}},
+              "required": ["cancellation_status"]
+            },
+            "then": {"required": ["confirmation_source", "confirmation_ref"]}
+          }
+        ]
+      },
+      "CancelRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["cancel_request_id", "reason_code", "client_requested_at", "deadline_ms"],
+        "properties": {
+          "cancel_request_id": {"$ref": "#/components/schemas/CancelRequestId"},
+          "reason_code": {"enum": ["operator_request", "timeout", "safety", "other"]},
+          "client_requested_at": {"type": "string", "format": "date-time"},
+          "deadline_ms": {"type": "integer", "minimum": 1, "maximum": 300000}
+        }
+      },
+      "CancelResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["cancel_request_id", "cancel_status", "received_at", "stop_confirmed", "confirmation_source"],
+        "properties": {
+          "cancel_request_id": {"$ref": "#/components/schemas/CancelRequestId"},
+          "cancel_status": {"enum": ["requested", "rejected", "unknown"]},
+          "received_at": {"type": "string", "format": "date-time"},
+          "stop_confirmed": {"type": "boolean"},
+          "confirmation_source": {"enum": ["safety_authority", "observation", "none"]},
+          "receipt_id": {"$ref": "#/components/schemas/ReceiptId"}
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {"stop_confirmed": {"const": true}},
+              "required": ["stop_confirmed"]
+            },
+            "then": {
+              "properties": {
+                "confirmation_source": {"enum": ["safety_authority", "observation"]}
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {"stop_confirmed": {"const": false}},
+              "required": ["stop_confirmed"]
+            },
+            "then": {
+              "properties": {
+                "confirmation_source": {"const": "none"}
+              }
+            }
+          }
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["code", "message", "retryable"],
+            "properties": {
+              "code": {
+                "enum": [
+                  "invalid_request", "unauthenticated", "forbidden_scope",
+                  "operation_key_payload_conflict", "operation_key_binding_conflict",
+                  "payload_digest_mismatch", "binding_digest_mismatch",
+                  "operation_type_not_allowed", "target_mismatch",
+                  "stale_node_boot_epoch", "stale_fence", "not_yet_valid",
+                  "expired", "authority_revoked", "approval_consumed",
+                  "approval_expired", "resource_limit_exceeded",
+                  "missing_dependency", "dependency_unavailable",
+                  "duplicate_in_progress", "not_found", "cancel_not_possible",
+                  "unknown_outcome"
+                ]
+              },
+              "message": {"type": "string"},
+              "retryable": {"type": "boolean"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

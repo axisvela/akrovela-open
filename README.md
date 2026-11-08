@@ -8,10 +8,11 @@ Public integration surface for AKROVELA, a governed edge/site execution platform
 | [akrovela](https://github.com/axisvela/akrovela) | Go/PostgreSQL core | AGPL-3.0-only |
 | [akrovela-ee](https://github.com/axisvela/akrovela-ee) | Enterprise extensions and internal product documentation | Enterprise |
 
-Unreleased `0.1.0`, bootstrap maturity C. Only operational endpoints and a Go
-version client exist. No executable-operation API, SBRP implementation, remote
-stop guarantee or verified robot support is claimed. URLs are target addresses;
-no package or binary is published by this initialization.
+Unreleased `0.1.0`, bootstrap maturity C. Operational endpoints, a Go version
+client and a reviewed v1 local operation/receipt contract exist. No
+executable-operation implementation, SBRP implementation, remote stop guarantee
+or verified robot support is claimed. URLs are target addresses; no package or
+binary is published by this initialization.
 
 ## Quickstart
 
@@ -26,8 +27,11 @@ go run ./examples/version http://127.0.0.1:2046
 
 This source-tree example needs a running local core, but no mutation or keys.
 It is not a published-package consumer check. Operational API:
-[contracts/bootstrap.openapi.json](contracts/bootstrap.openapi.json).
-Public usage: [docs/README.md](docs/README.md).
+[contracts/bootstrap.openapi.json](contracts/bootstrap.openapi.json). Local
+operation/receipt contract:
+[contracts/operations/v1/operations.openapi.json](contracts/operations/v1/operations.openapi.json).
+Public usage: [docs/README.md](docs/README.md) and
+[operation contract usage](docs/operations.md).
 
 Apache-2.0 covers this repository's original source, not imported core binaries.
 Future release bundles must retain AGPL notices, matching corresponding source,

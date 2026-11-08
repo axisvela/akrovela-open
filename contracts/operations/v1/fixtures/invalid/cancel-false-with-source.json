@@ -1,0 +1,8 @@
+{
+  "_schema": "CancelResponse",
+  "cancel_request_id": "cancel:0192f100-4a1b-7c3d-8e2f-5a6b7c8d9e0f",
+  "cancel_status": "requested",
+  "received_at": "2026-11-08T12:01:30.050Z",
+  "stop_confirmed": false,
+  "confirmation_source": "safety_authority"
+}

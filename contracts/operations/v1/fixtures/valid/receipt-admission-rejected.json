@@ -1,0 +1,19 @@
+{
+  "receipt_id": "receipt:0192f104-3d4e-7f5a-8b6c-7d8e9f001122",
+  "receipt_sequence": 1,
+  "receipt_type": "admission",
+  "operation_key": "op:0192f0f2-7d6f-7c2a-9d1e-2b6f0f7a9c31",
+  "emitted_at": "2026-11-08T11:59:59Z",
+  "payload_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "binding_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "fencing_token": 42,
+  "contract_mode": "fixture",
+  "admission_status": "rejected",
+  "execution_status": "not_started",
+  "cancellation_status": "not_requested",
+  "effect_status": "not_evaluated",
+  "evidence_refs": [
+    "peiravela:evidence/admission/1"
+  ],
+  "receipt_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+}

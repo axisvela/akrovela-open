@@ -3,4 +3,6 @@
 ## Unreleased
 
 - Bootstrap operational OpenAPI, dependency-free Go client and source example.
-- No published SDK package, core binary or execution protocol is claimed.
+- Add reviewed v1 local operation/receipt contract, valid and invalid fixtures,
+  and public usage; no executor, database or live KINETOVELA integration.
+- No published SDK package, core binary or execution implementation is claimed.

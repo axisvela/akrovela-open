@@ -1,0 +1,65 @@
+{
+  "_schema": "Receipt",
+  "receipt_id": "receipt:0192f101-0a1b-7c2d-8e3f-4a5b6c7d8e9f",
+  "receipt_sequence": 3,
+  "receipt_type": "execution",
+  "operation_key": "op:0192f0f2-7d6f-7c2a-9d1e-2b6f0f7a9c31",
+  "attempt_id": "attempt:0192f102-1b2c-7d3e-8f4a-5b6c7d8e9f00",
+  "emitted_at": "2026-11-08T12:02:10Z",
+  "payload_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "binding_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "fencing_token": 42,
+  "contract_mode": "live",
+  "admission_status": "accepted",
+  "execution_status": "completed",
+  "cancellation_status": "not_requested",
+  "effect_status": "verified",
+  "executor_facts": {
+    "adapter": "ros2-nav2",
+    "goal_id": "nav2-goal-uuid",
+    "terminal_state": "SUCCEEDED",
+    "action_terminated": true,
+    "started_at": "2026-11-08T12:00:01Z",
+    "completed_at": "2026-11-08T12:01:55Z"
+  },
+  "observations": [
+    {
+      "observation_id": "obs:0192f103-2c3d-7e4f-8a5b-6c7d8e9f0011",
+      "source_id": "gz-ground-truth-pose",
+      "trust_domain": "simulator-ground-truth",
+      "state_label": "simulated",
+      "clock_domain": "gazebo-sim",
+      "source_epoch": 3,
+      "seq": 9001,
+      "observed_at": "2026-11-08T12:01:55Z",
+      "received_at": "2026-11-08T12:01:55.080Z",
+      "max_age_ms": 500,
+      "max_clock_skew_ms": 100,
+      "freshness_decision": "accepted",
+      "subject": {
+        "robot_ref": "robot:tb4-01",
+        "operation_key": "op:0192f0f2-7d6f-7c2a-9d1e-2b6f0f7a9c31",
+        "attempt_id": "attempt:0192f102-1b2c-7d3e-8f4a-5b6c7d8e9f00",
+        "execution_epoch": 7,
+        "map_ref": "map:wh3/aisle-a@sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "target_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+      },
+      "digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+    }
+  ],
+  "verifier": {
+    "verifier_id": "arrival-verifier",
+    "result": "verified",
+    "evaluated_at": "2026-11-08T12:02:02Z",
+    "independent_of_executor": true,
+    "trust_domain": "simulator-ground-truth",
+    "shared_failure_modes": [
+      "shares Gazebo process and host with the observation source"
+    ],
+    "evidence_ref": "peiravela:evidence/attempt:0192f102-1b2c-7d3e-8f4a-5b6c7d8e9f00/sha256:3333333333333333333333333333333333333333333333333333333333333333"
+  },
+  "evidence_refs": [
+    "peiravela:run/run-1/attempts/attempt:0192f102-1b2c-7d3e-8f4a-5b6c7d8e9f00"
+  ],
+  "receipt_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+}
