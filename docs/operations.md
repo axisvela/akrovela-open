@@ -39,6 +39,27 @@ Mission. ROS topics, Nav2 action results and Gazebo facts are not authority.
 Keys are URL-safe and contain no `/`. Authentication uses a bearer principal;
 body scope is checked against the authenticated tenant, workspace and site.
 
+## Embedding and Observation Limits
+
+A future AKROVELA-owned PRAXO-CORE adapter consumes this public contract; it
+does not make this SDK an Agent runtime or introduce Core robotics types.
+Current deterministic source execution supports only empty observation references
+and no independently verified trajectory. The schemas alone do not implement
+grants, approval consumption, resource enforcement or observation authenticity.
+
+Before implementing prerequisite observations, review their binding separately
+from post-attempt evidence: an attempt identity cannot be invented before the
+execution authority assigns it. Review exact digest/approval coverage of resource
+limits, observation policy and retention rather than assuming every field is in
+the current binding digest. This note changes no schema or digest definition.
+
+Keep validity UTC, observation clock/error bounds and simulator epoch/ticks
+distinct. Given combined clock-error bound U, require worst-case observation age
+at release to satisfy `release_time - observed_at + U <= max_age`; unknown bounds
+block dependent actions. Source epoch changes need authenticated rebinding;
+repeated reads do not refresh time. A local verified result remains scoped
+evidence, not KINETOVELA Mission completion or independent assurance certification.
+
 ## Bindings
 
 A submission binds:
