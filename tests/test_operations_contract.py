@@ -1,5 +1,7 @@
 import hashlib
 import json
+import math
+from decimal import Decimal
 from pathlib import Path
 import re
 import unittest
@@ -24,6 +26,42 @@ def load(path):
     return json.loads(path.read_text())
 
 
+def canonical_number(value):
+    if isinstance(value, bool):
+        raise TypeError('boolean is not a number')
+    if isinstance(value, int):
+        return str(value)
+    if not isinstance(value, float):
+        raise TypeError(type(value))
+    if math.isnan(value) or math.isinf(value):
+        raise ValueError('non-finite number')
+    if value == 0:
+        return '0'
+    sign = '-' if value < 0 else ''
+    if value < 0:
+        value = -value
+    decimal = Decimal(repr(value))
+    digits = list(decimal.as_tuple().digits)
+    exponent = decimal.as_tuple().exponent
+    while len(digits) > 1 and digits[-1] == 0:
+        digits.pop()
+        exponent += 1
+    text = ''.join(str(digit) for digit in digits)
+    k = len(text)
+    n = exponent + k
+    if k <= n <= 21:
+        out = text + '0' * (n - k)
+    elif 0 < n <= 21:
+        out = text[:n] + '.' + text[n:]
+    elif -6 < n <= 0:
+        out = '0.' + '0' * (-n) + text
+    else:
+        out = text if k == 1 else text[0] + '.' + text[1:]
+        exponent_value = n - 1
+        out += 'e' + ('+' if exponent_value >= 0 else '-') + str(abs(exponent_value))
+    return sign + out
+
+
 def canonical(value):
     if isinstance(value, dict):
         return '{' + ','.join(
@@ -39,9 +77,7 @@ def canonical(value):
     if isinstance(value, int):
         return str(value)
     if isinstance(value, float):
-        if value == int(value) and abs(value) < 1e21:
-            return str(int(value))
-        return repr(value)
+        return canonical_number(value)
     if isinstance(value, str):
         return json.dumps(value, ensure_ascii=False)
     raise TypeError(type(value))
@@ -213,6 +249,23 @@ class OperationsContractTests(unittest.TestCase):
         binding = self.schemas['SubmitOperationRequest']['properties']['binding_digest']
         self.assertEqual(binding.get('x-binding-fields'), BINDING_FIELDS)
 
+    def test_canonical_number_vectors(self):
+        cases = [
+            (1e-6, '0.000001'),
+            (1.234e-6, '0.000001234'),
+            (1e-7, '1e-7'),
+            (1e20, '100000000000000000000'),
+            (1e21, '1e+21'),
+            (0.45, '0.45'),
+            (40.0, '40'),
+            (-0.0, '0'),
+            (12.4, '12.4'),
+            (-3.1, '-3.1'),
+            (1.5708, '1.5708'),
+        ]
+        for value, expected in cases:
+            self.assertEqual(canonical_number(value), expected, value)
+
     def test_valid_submit_binding_digest_matches_fixture(self):
         document = load(FIXTURES / 'valid' / 'submit-navigate.json')
         self.assertEqual(document['binding_digest'], binding_digest(document, BINDING_FIELDS))
@@ -261,6 +314,7 @@ class OperationsContractTests(unittest.TestCase):
     def test_valid_fixtures(self):
         schema_names = {
             'submit-navigate': 'SubmitOperationRequest',
+            'submit-small-floats': 'SubmitOperationRequest',
             'operation-view': 'OperationView',
             'cancel-request': 'CancelRequest',
             'cancel-response': 'CancelResponse',
