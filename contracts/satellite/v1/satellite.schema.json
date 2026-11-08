@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://axisvela.github.io/akrovela/contracts/satellite/v1/satellite.schema.json",
+  "title": "AKROVELA Satellite Command Protocol v1",
+  "x-contract-version": "v1",
+  "x-contract-status": "reviewed",
+  "x-protocol-version": "akrovela.satellite/v1",
+  "$defs": {
+    "ScopeId": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "MessageId": {"type": "string", "pattern": "^msg:[A-Za-z0-9._~-]+$"},
+    "SessionId": {"type": "string", "pattern": "^session:[A-Za-z0-9._~-]+$"},
+    "Digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "DateTime": {"type": "string", "format": "date-time"},
+    "EnvelopeBase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version", "message_type", "message_id", "session_id",
+        "sequence", "tenant_id", "workspace_id", "site_id", "satellite_id",
+        "source_epoch", "coordinator_id", "coordinator_epoch", "sent_at", "body"
+      ],
+      "properties": {
+        "protocol_version": {"const": "akrovela.satellite/v1"},
+        "message_type": {"type": "string", "enum": ["hello", "hello_ack", "resume", "resume_result", "submit", "submit_result", "status", "status_result", "cancel", "cancel_result", "receipt_batch", "receipt_ack", "heartbeat"]},
+        "message_id": {"$ref": "#/$defs/MessageId"},
+        "session_id": {"$ref": "#/$defs/SessionId"},
+        "sequence": {"type": "integer", "minimum": 1},
+        "tenant_id": {"$ref": "#/$defs/ScopeId"},
+        "workspace_id": {"$ref": "#/$defs/ScopeId"},
+        "site_id": {"$ref": "#/$defs/ScopeId"},
+        "satellite_id": {"$ref": "#/$defs/ScopeId"},
+        "source_epoch": {"type": "integer", "minimum": 1},
+        "coordinator_id": {"$ref": "#/$defs/ScopeId"},
+        "coordinator_epoch": {"type": "integer", "minimum": 1},
+        "sent_at": {"$ref": "#/$defs/DateTime"},
+        "body": {"type": "object"}
+      }
+    },
+    "ScopeRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenant_id", "workspace_id", "site_id"],
+      "properties": {
+        "tenant_id": {"$ref": "#/$defs/ScopeId"},
+        "workspace_id": {"$ref": "#/$defs/ScopeId"},
+        "site_id": {"$ref": "#/$defs/ScopeId"}
+      }
+    },
+    "Target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "node_boot_epoch", "robot_ref", "adapter", "adapter_version", "map_ref", "frame_id"],
+      "properties": {
+        "node_id": {"$ref": "#/$defs/ScopeId"},
+        "node_boot_epoch": {"type": "integer", "minimum": 1},
+        "robot_ref": {"type": "string", "pattern": "^robot:[A-Za-z0-9._~:/-]+$"},
+        "adapter": {"const": "ros2-nav2"},
+        "adapter_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "map_ref": {"type": "string", "pattern": "^map:[A-Za-z0-9._~:/-]+@sha256:[a-f0-9]{64}$"},
+        "frame_id": {"type": "string", "pattern": "^[A-Za-z0-9._/-]+$"}
+      }
+    },
+    "Validity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["not_before", "expires_at", "clock_domain", "max_clock_skew_ms", "revalidate_at_release"],
+      "properties": {
+        "not_before": {"$ref": "#/$defs/DateTime"},
+        "expires_at": {"$ref": "#/$defs/DateTime"},
+        "clock_domain": {"const": "authority-utc"},
+        "max_clock_skew_ms": {"type": "integer", "minimum": 0, "maximum": 60000},
+        "revalidate_at_release": {"const": true}
+      }
+    },
+    "ResourceLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_duration_ms", "max_goal_distance_m", "max_path_length_m", "max_speed_mps", "max_attempts", "max_retries", "max_payload_bytes"],
+      "properties": {
+        "max_duration_ms": {"type": "integer", "minimum": 1, "maximum": 3600000},
+        "max_goal_distance_m": {"type": "number", "minimum": 0, "maximum": 10000},
+        "max_path_length_m": {"type": "number", "minimum": 0, "maximum": 100000},
+        "max_speed_mps": {"type": "number", "minimum": 0, "maximum": 10},
+        "max_attempts": {"type": "integer", "minimum": 1, "maximum": 10},
+        "max_retries": {"type": "integer", "minimum": 0, "maximum": 10},
+        "max_payload_bytes": {"type": "integer", "minimum": 1, "maximum": 1048576}
+      }
+    },
+    "SubmitBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation_key", "attempt_id", "operation_type", "payload_digest",
+        "binding_digest", "target", "mission_ref", "assignment_ref", "lease_ref",
+        "fencing_token", "safety_envelope_ref", "authority_ref", "approval_ref",
+        "validity", "resource_limits", "observation_refs",
+        "idempotency_retention_seconds", "dispatch_not_after", "contract_mode"
+      ],
+      "properties": {
+        "operation_key": {"type": "string", "pattern": "^op:[A-Za-z0-9._~-]+$"},
+        "attempt_id": {"type": "string", "pattern": "^attempt:[A-Za-z0-9._~-]+$"},
+        "operation_type": {"const": "ros2.nav2.navigate_to_pose@1"},
+        "payload_digest": {"$ref": "#/$defs/Digest"},
+        "binding_digest": {"$ref": "#/$defs/Digest"},
+        "target": {"$ref": "#/$defs/Target"},
+        "mission_ref": {"type": "string", "pattern": "^mission:[A-Za-z0-9._~:/-]+$"},
+        "assignment_ref": {"type": "string", "pattern": "^assignment:[A-Za-z0-9._~:/-]+$"},
+        "lease_ref": {"type": "string", "pattern": "^lease:[A-Za-z0-9._~:/-]+$"},
+        "fencing_token": {"type": "integer", "minimum": 1},
+        "safety_envelope_ref": {"type": "string", "pattern": "^safe:[A-Za-z0-9._~:/-]+$"},
+        "authority_ref": {"type": "string", "pattern": "^grant:[A-Za-z0-9._~:/-]+$"},
+        "approval_ref": {"type": "string", "pattern": "^approval:[A-Za-z0-9._~:/-]+$"},
+        "validity": {"$ref": "#/$defs/Validity"},
+        "resource_limits": {"$ref": "#/$defs/ResourceLimits"},
+        "observation_refs": {"type": "array", "maxItems": 0},
+        "idempotency_retention_seconds": {"type": "integer", "minimum": 1, "maximum": 31536000},
+        "dispatch_not_after": {"$ref": "#/$defs/DateTime"},
+        "contract_mode": {"const": "fixture"}
+      }
+    },
+    "SubmitResultBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation_key", "attempt_id", "command_id", "status", "accepted_at", "source_epoch"],
+      "properties": {
+        "operation_key": {"type": "string", "pattern": "^op:[A-Za-z0-9._~-]+$"},
+        "attempt_id": {"type": "string", "pattern": "^attempt:[A-Za-z0-9._~-]+$"},
+        "command_id": {"type": "string", "pattern": "^cmd:[A-Za-z0-9._~-]+$"},
+        "status": {"type": "string", "enum": ["durably_accepted", "rejected"]},
+        "reason": {"type": "string"},
+        "accepted_at": {"$ref": "#/$defs/DateTime"},
+        "source_epoch": {"type": "integer", "minimum": 1}
+      }
+    },
+    "CancelBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation_key", "attempt_id", "cancel_request_id", "reason_code", "client_requested_at", "deadline_ms"],
+      "properties": {
+        "operation_key": {"type": "string", "pattern": "^op:[A-Za-z0-9._~-]+$"},
+        "attempt_id": {"type": "string", "pattern": "^attempt:[A-Za-z0-9._~-]+$"},
+        "cancel_request_id": {"type": "string", "pattern": "^cancel:[A-Za-z0-9._~-]+$"},
+        "reason_code": {"type": "string", "enum": ["operator_request", "timeout", "safety", "other"]},
+        "client_requested_at": {"$ref": "#/$defs/DateTime"},
+        "deadline_ms": {"type": "integer", "minimum": 1, "maximum": 300000}
+      }
+    },
+    "CancelResultBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cancel_request_id", "status", "asserted_at"],
+      "properties": {
+        "cancel_request_id": {"type": "string", "pattern": "^cancel:[A-Za-z0-9._~-]+$"},
+        "status": {"type": "string", "enum": ["cancel_requested", "cancel_rejected", "local_stop_asserted", "cancel_unknown"]},
+        "confirmation_source": {"type": "string", "enum": ["safety_authority", "observation", "none"]},
+        "confirmation_ref": {"type": "string"},
+        "asserted_at": {"$ref": "#/$defs/DateTime"}
+      }
+    },
+    "ReceiptBatchBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["satellite_id", "receipts"],
+      "properties": {
+        "satellite_id": {"$ref": "#/$defs/ScopeId"},
+        "receipts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["satellite_receipt_id", "operation_key", "attempt_id", "receipt_type", "sequence", "digest", "emitted_at"],
+            "properties": {
+              "satellite_receipt_id": {"type": "string", "pattern": "^satreceipt:[A-Za-z0-9._~-]+$"},
+              "operation_key": {"type": "string", "pattern": "^op:[A-Za-z0-9._~-]+$"},
+              "attempt_id": {"type": "string", "pattern": "^attempt:[A-Za-z0-9._~-]+$"},
+              "receipt_type": {"type": "string", "enum": ["admission", "execution", "cancellation", "evidence", "repair"]},
+              "sequence": {"type": "integer", "minimum": 1},
+              "digest": {"$ref": "#/$defs/Digest"},
+              "emitted_at": {"$ref": "#/$defs/DateTime"}
+            }
+          }
+        }
+      }
+    },
+    "HeartbeatBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "queue_depth"],
+      "properties": {
+        "state": {"type": "string", "enum": ["resuming", "draining", "ready", "degraded"]},
+        "queue_depth": {"type": "integer", "minimum": 0, "maximum": 256}
+      }
+    },
+    "HelloBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol_min", "protocol_max", "capabilities"],
+      "properties": {
+        "protocol_min": {"type": "string"},
+        "protocol_max": {"type": "string"},
+        "capabilities": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "HelloMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "hello"}, "body": {"$ref": "#/$defs/HelloBody"}}, "required": ["message_type", "body"]}]},
+    "SubmitMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "submit"}, "body": {"$ref": "#/$defs/SubmitBody"}}, "required": ["message_type", "body"]}]},
+    "SubmitResultMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "submit_result"}, "body": {"$ref": "#/$defs/SubmitResultBody"}}, "required": ["message_type", "body"]}]},
+    "CancelMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "cancel"}, "body": {"$ref": "#/$defs/CancelBody"}}, "required": ["message_type", "body"]}]},
+    "CancelResultMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "cancel_result"}, "body": {"$ref": "#/$defs/CancelResultBody"}}, "required": ["message_type", "body"]}]},
+    "ReceiptBatchMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "receipt_batch"}, "body": {"$ref": "#/$defs/ReceiptBatchBody"}}, "required": ["message_type", "body"]}]},
+    "HeartbeatMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "heartbeat"}, "body": {"$ref": "#/$defs/HeartbeatBody"}}, "required": ["message_type", "body"]}]}
+  }
+}

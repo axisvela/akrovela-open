@@ -1,0 +1,24 @@
+{
+  "_schema": "SubmitResultMessage",
+  "protocol_version": "akrovela.satellite/v1",
+  "message_type": "submit_result",
+  "message_id": "msg:submit-result-1",
+  "session_id": "session:coordinator-1",
+  "sequence": 4,
+  "tenant_id": "tenant-acme",
+  "workspace_id": "wh3",
+  "site_id": "site-wh3",
+  "satellite_id": "akrovela-node-wh3-01",
+  "source_epoch": 7,
+  "coordinator_id": "coordinator-wh3-01",
+  "coordinator_epoch": 4,
+  "sent_at": "2026-11-08T12:00:01Z",
+  "body": {
+    "operation_key": "op:0192f0f2-7d6f-7c2a-9d1e-2b6f0f7a9c31",
+    "attempt_id": "attempt:0192f102-1b2c-7d3e-8f4a-5b6c7d8e9f00",
+    "command_id": "cmd:0192f103-2c3d-7e4f-8a5b-6c7d8e9f0011",
+    "status": "durably_accepted",
+    "accepted_at": "2026-11-08T12:00:01Z",
+    "source_epoch": 7
+  }
+}

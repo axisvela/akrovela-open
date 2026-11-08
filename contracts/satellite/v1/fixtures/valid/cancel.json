@@ -1,0 +1,24 @@
+{
+  "_schema": "CancelMessage",
+  "protocol_version": "akrovela.satellite/v1",
+  "message_type": "cancel",
+  "message_id": "msg:cancel-1",
+  "session_id": "session:coordinator-1",
+  "sequence": 5,
+  "tenant_id": "tenant-acme",
+  "workspace_id": "wh3",
+  "site_id": "site-wh3",
+  "satellite_id": "akrovela-node-wh3-01",
+  "source_epoch": 7,
+  "coordinator_id": "coordinator-wh3-01",
+  "coordinator_epoch": 4,
+  "sent_at": "2026-11-08T12:00:30Z",
+  "body": {
+    "operation_key": "op:0192f0f2-7d6f-7c2a-9d1e-2b6f0f7a9c31",
+    "attempt_id": "attempt:0192f102-1b2c-7d3e-8f4a-5b6c7d8e9f00",
+    "cancel_request_id": "cancel:0192f100-4a1b-7c3d-8e2f-5a6b7c8d9e0f",
+    "reason_code": "operator_request",
+    "client_requested_at": "2026-11-08T12:00:30Z",
+    "deadline_ms": 5000
+  }
+}

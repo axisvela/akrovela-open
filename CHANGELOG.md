@@ -9,4 +9,6 @@
   references and idempotency retention, so changed effective fields conflict.
 - Record that AKROVELA embeds PRAXO-CORE and consumes this contract through
   exact-operation tools without changing the v1 wire schema or SDK.
+- Add the reviewed satellite command protocol v1, fixtures and review record;
+  fixture-mode only, no live/ROS/effect claim.
 - No published SDK package, core binary or execution implementation is claimed.
