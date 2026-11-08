@@ -1,0 +1,23 @@
+{
+  "_schema": "ResumeMessage",
+  "protocol_version": "akrovela.satellite/v1",
+  "message_type": "resume",
+  "message_id": "msg:resume-1",
+  "session_id": "session:coordinator-1",
+  "sequence": 3,
+  "tenant_id": "tenant-acme",
+  "workspace_id": "wh3",
+  "site_id": "site-wh3",
+  "satellite_id": "akrovela-node-wh3-01",
+  "source_epoch": 7,
+  "coordinator_id": "coordinator-wh3-01",
+  "coordinator_epoch": 4,
+  "sent_at": "2026-11-08T12:00:01Z",
+  "body": {
+    "token": "resume:1",
+    "last_uplink_sequence": 0,
+    "last_downlink_sequence": 0,
+    "source_epoch": 7,
+    "coordinator_epoch": 4
+  }
+}

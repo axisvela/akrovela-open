@@ -1,0 +1,20 @@
+{
+  "_schema": "ReceiptAckMessage",
+  "protocol_version": "akrovela.satellite/v1",
+  "message_type": "receipt_ack",
+  "message_id": "msg:receipt-ack-1",
+  "session_id": "session:coordinator-1",
+  "sequence": 9,
+  "tenant_id": "tenant-acme",
+  "workspace_id": "wh3",
+  "site_id": "site-wh3",
+  "satellite_id": "akrovela-node-wh3-01",
+  "source_epoch": 7,
+  "coordinator_id": "coordinator-wh3-01",
+  "coordinator_epoch": 4,
+  "sent_at": "2026-11-08T12:01:01Z",
+  "body": {
+    "satellite_id": "akrovela-node-wh3-01",
+    "acked_through_sequence": 1
+  }
+}

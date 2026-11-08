@@ -209,6 +209,89 @@
     "CancelMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "cancel"}, "body": {"$ref": "#/$defs/CancelBody"}}, "required": ["message_type", "body"]}]},
     "CancelResultMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "cancel_result"}, "body": {"$ref": "#/$defs/CancelResultBody"}}, "required": ["message_type", "body"]}]},
     "ReceiptBatchMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "receipt_batch"}, "body": {"$ref": "#/$defs/ReceiptBatchBody"}}, "required": ["message_type", "body"]}]},
-    "HeartbeatMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "heartbeat"}, "body": {"$ref": "#/$defs/HeartbeatBody"}}, "required": ["message_type", "body"]}]}
+    "HeartbeatMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "heartbeat"}, "body": {"$ref": "#/$defs/HeartbeatBody"}}, "required": ["message_type", "body"]}]},
+    "StatusBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation_key", "attempt_id"],
+      "properties": {
+        "operation_key": {"type": "string", "pattern": "^op:[A-Za-z0-9._~-]+$"},
+        "attempt_id": {"type": "string", "pattern": "^attempt:[A-Za-z0-9._~-]+$"}
+      }
+    },
+    "StatusResultBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation_key", "attempt_id", "state", "updated_at"],
+      "properties": {
+        "operation_key": {"type": "string", "pattern": "^op:[A-Za-z0-9._~-]+$"},
+        "attempt_id": {"type": "string", "pattern": "^attempt:[A-Za-z0-9._~-]+$"},
+        "state": {"type": "string", "enum": ["received", "durably_accepted", "started", "completed", "failed", "confirmed_no_effect", "unknown", "rejected"]},
+        "reason": {"type": "string"},
+        "updated_at": {"$ref": "#/$defs/DateTime"}
+      }
+    },
+    "HelloAckBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol_version", "accepted"],
+      "properties": {
+        "protocol_version": {"const": "akrovela.satellite/v1"},
+        "accepted": {"type": "boolean"},
+        "reason": {"type": "string"}
+      }
+    },
+    "ResumeBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["token", "last_uplink_sequence", "last_downlink_sequence", "source_epoch", "coordinator_epoch"],
+      "properties": {
+        "token": {"type": "string", "minLength": 1},
+        "last_uplink_sequence": {"type": "integer", "minimum": 0},
+        "last_downlink_sequence": {"type": "integer", "minimum": 0},
+        "source_epoch": {"type": "integer", "minimum": 1},
+        "coordinator_epoch": {"type": "integer", "minimum": 1}
+      }
+    },
+    "ResumeResultBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["accepted", "drain_state", "uplink_high_water", "downlink_high_water"],
+      "properties": {
+        "accepted": {"type": "boolean"},
+        "drain_state": {"type": "string", "enum": ["resuming", "draining", "ready"]},
+        "uplink_high_water": {"type": "integer", "minimum": 0},
+        "downlink_high_water": {"type": "integer", "minimum": 0},
+        "reason": {"type": "string"}
+      }
+    },
+    "ReceiptAckBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["satellite_id", "acked_through_sequence"],
+      "properties": {
+        "satellite_id": {"$ref": "#/$defs/ScopeId"},
+        "acked_through_sequence": {"type": "integer", "minimum": 0}
+      }
+    },
+    "StatusMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "status"}, "body": {"$ref": "#/$defs/StatusBody"}}, "required": ["message_type", "body"]}]},
+    "StatusResultMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "status_result"}, "body": {"$ref": "#/$defs/StatusResultBody"}}, "required": ["message_type", "body"]}]},
+    "HelloAckMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "hello_ack"}, "body": {"$ref": "#/$defs/HelloAckBody"}}, "required": ["message_type", "body"]}]},
+    "ResumeMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "resume"}, "body": {"$ref": "#/$defs/ResumeBody"}}, "required": ["message_type", "body"]}]},
+    "ResumeResultMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "resume_result"}, "body": {"$ref": "#/$defs/ResumeResultBody"}}, "required": ["message_type", "body"]}]},
+    "ReceiptAckMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "receipt_ack"}, "body": {"$ref": "#/$defs/ReceiptAckBody"}}, "required": ["message_type", "body"]}]},
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "unsupported_version", "unauthenticated", "forbidden_identity",
+        "forbidden_scope", "expired_dispatch", "stale_coordinator_epoch",
+        "stale_source_epoch", "binding_conflict", "operation_key_binding_conflict",
+        "operation_key_payload_conflict", "duplicate_in_progress",
+        "message_replayed", "queue_full", "frame_too_large", "invalid_request",
+        "cancel_not_possible", "unknown_outcome", "dependency_unavailable",
+        "not_found", "approval_consumed", "stale_node_boot_epoch",
+        "not_yet_valid", "expired", "reconciliation_required", "action_in_progress"
+      ]
+    }
   }
 }

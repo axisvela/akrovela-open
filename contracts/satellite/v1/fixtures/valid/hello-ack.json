@@ -1,0 +1,20 @@
+{
+  "_schema": "HelloAckMessage",
+  "protocol_version": "akrovela.satellite/v1",
+  "message_type": "hello_ack",
+  "message_id": "msg:hello-ack-1",
+  "session_id": "session:coordinator-1",
+  "sequence": 2,
+  "tenant_id": "tenant-acme",
+  "workspace_id": "wh3",
+  "site_id": "site-wh3",
+  "satellite_id": "akrovela-node-wh3-01",
+  "source_epoch": 7,
+  "coordinator_id": "coordinator-wh3-01",
+  "coordinator_epoch": 4,
+  "sent_at": "2026-11-08T12:00:00Z",
+  "body": {
+    "protocol_version": "akrovela.satellite/v1",
+    "accepted": true
+  }
+}

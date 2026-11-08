@@ -24,12 +24,24 @@ class SatelliteContractTests(unittest.TestCase):
 
     def test_message_set(self):
         for name in (
-            'HelloMessage', 'SubmitMessage', 'SubmitResultMessage',
+            'HelloMessage', 'HelloAckMessage', 'SubmitMessage', 'SubmitResultMessage',
             'CancelMessage', 'CancelResultMessage', 'ReceiptBatchMessage',
-            'HeartbeatMessage', 'EnvelopeBase', 'SubmitBody', 'Target',
-            'Validity', 'ResourceLimits',
+            'ReceiptAckMessage', 'HeartbeatMessage', 'StatusMessage',
+            'StatusResultMessage', 'ResumeMessage', 'ResumeResultMessage',
+            'EnvelopeBase', 'SubmitBody', 'Target', 'Validity', 'ResourceLimits',
+            'ErrorCode',
         ):
             self.assertIn(name, self.defs)
+
+    def test_error_code_set(self):
+        codes = set(self.defs['ErrorCode']['enum'])
+        for code in (
+            'unsupported_version', 'forbidden_scope', 'expired_dispatch',
+            'stale_coordinator_epoch', 'stale_source_epoch', 'binding_conflict',
+            'queue_full', 'frame_too_large', 'reconciliation_required',
+            'action_in_progress', 'cancel_not_possible', 'unknown_outcome',
+        ):
+            self.assertIn(code, codes)
 
     def test_envelope_requires_identity_and_epoch(self):
         base = self.defs['EnvelopeBase']
