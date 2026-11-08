@@ -285,7 +285,8 @@
       "enum": [
         "unsupported_version", "unauthenticated", "forbidden_identity",
         "forbidden_scope", "expired_dispatch", "stale_coordinator_epoch",
-        "stale_source_epoch", "binding_conflict", "operation_key_binding_conflict",
+        "stale_source_epoch", "binding_conflict", "binding_digest_mismatch",
+        "payload_digest_mismatch", "operation_key_binding_conflict",
         "operation_key_payload_conflict", "duplicate_in_progress",
         "message_replayed", "queue_full", "frame_too_large", "invalid_request",
         "cancel_not_possible", "unknown_outcome", "dependency_unavailable",
