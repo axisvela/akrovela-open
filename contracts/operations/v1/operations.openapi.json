@@ -387,7 +387,7 @@
           "operation_key": {"$ref": "#/components/schemas/OperationKey"},
           "operation_type": {"const": "ros2.nav2.navigate_to_pose@1"},
           "payload_digest": {"description": "SHA-256 over RFC 8785 JCS of {operation_type, payload}.", "$ref": "#/components/schemas/Digest"},
-          "binding_digest": {"description": "SHA-256 over RFC 8785 JCS of {scope, target, mission_ref, assignment_ref, lease_ref, fencing_token, safety_envelope_ref, authority_ref, approval_ref, validity}.", "$ref": "#/components/schemas/Digest"},
+          "binding_digest": {"description": "SHA-256 over RFC 8785 JCS of {scope, target, mission_ref, assignment_ref, lease_ref, fencing_token, safety_envelope_ref, authority_ref, approval_ref, validity, resource_limits, observation_refs, idempotency_retention_seconds}.", "x-binding-fields": ["scope", "target", "mission_ref", "assignment_ref", "lease_ref", "fencing_token", "safety_envelope_ref", "authority_ref", "approval_ref", "validity", "resource_limits", "observation_refs", "idempotency_retention_seconds"], "$ref": "#/components/schemas/Digest"},
           "payload": {"$ref": "#/components/schemas/NavigateToPosePayload"},
           "scope": {"$ref": "#/components/schemas/Scope"},
           "target": {"$ref": "#/components/schemas/Target"},

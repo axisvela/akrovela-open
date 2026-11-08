@@ -3,7 +3,7 @@
   "operation_key": "op:0192f0f2-7d6f-7c2a-9d1e-2b6f0f7a9c31",
   "operation_type": "ros2.nav2.navigate_to_pose@1",
   "payload_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-  "binding_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "binding_digest": "sha256:7d70d76e5cfe78dfc483b9f11c45cf56c62da5c1c0e4624e2d57932b34769871",
   "payload": {
     "goal": {
       "x": 12.4,

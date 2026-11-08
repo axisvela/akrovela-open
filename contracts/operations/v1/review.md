@@ -32,6 +32,8 @@ escalation. No component may substitute its fact for another's authority.
 | Unknown operation type or shell/URI field | Reject with `operation_type_not_allowed` or `invalid_request` | Operation allowlist and closed payload |
 | Same key, different payload digest | Reject with `operation_key_payload_conflict` | Contract fields; stateful test required |
 | Same key, different target/epoch/fence/authority binding | Reject with `operation_key_binding_conflict` | `binding_digest`; stateful test required |
+| Same key, different resource limits or idempotency retention | Reject with `operation_key_binding_conflict` | `binding_digest`; stateful test required |
+| Same key with non-empty observation refs | Reject with `missing_dependency` until observations are supported | Current deterministic executor rejects non-empty refs before admission; the digest still binds the field |
 | Missing operation key or fence | Reject as invalid | `submit-missing-fencing-token.json` |
 | Zero fencing token | Reject as invalid | `submit-zero-fence.json` |
 | Missing binding digest | Reject as invalid | `submit-missing-binding-digest.json` |
@@ -73,8 +75,9 @@ escalation. No component may substitute its fact for another's authority.
 - Receipt types and conditional requirements separate admission receipts from
   execution evidence; a verified effect needs a verified verifier result and an
   observation, and a stop needs a confirmation source and reference.
-- Digests use RFC 8785 JCS, include the target/epoch/authority binding, and are
-  recomputed by the server.
+- Digests use RFC 8785 JCS; the binding digest includes target, epoch, authority,
+  resource limits, observation references and idempotency retention, and the server
+  recomputes it.
 - Zero fencing tokens are rejected by the contract.
 - Simulation, ROS action state, receipts and Mission completion remain distinct.
 

@@ -41,11 +41,14 @@ body scope is checked against the authenticated tenant, workspace and site.
 
 ## Embedding and Observation Limits
 
-A future AKROVELA-owned PRAXO-CORE adapter consumes this public contract; it
-does not make this SDK an Agent runtime or introduce Core robotics types.
-Current deterministic source execution supports only empty observation references
-and no independently verified trajectory. The schemas alone do not implement
-grants, approval consumption, resource enforcement or observation authenticity.
+AKROVELA embeds PRAXO-CORE as a product component. Its `praxocore` tools
+(submit/status/cancel/receipts) consume this public contract for exactly one
+trusted operation assembly; model tool arguments carry no operation, target,
+authority or resource selection. Direct non-Agent operation paths remain
+supported. Current deterministic runtime execution supports only empty observation
+references and no independently verified trajectory. The schemas alone do not
+implement grants, approval consumption, resource enforcement or observation
+authenticity.
 
 Before implementing prerequisite observations, review their binding separately
 from post-attempt evidence: an attempt identity cannot be invented before the
@@ -67,9 +70,10 @@ A submission binds:
 - `operation_key` and `protocol_version`;
 - `payload_digest` as SHA-256 over RFC 8785 JSON Canonicalization Scheme (JCS) of
   `{operation_type, payload}`;
-- `binding_digest` as SHA-256 over JCS of scope, target, node boot epoch, map,
-  Mission/assignment/lease references, fence, safety envelope, authority,
-  approval and validity;
+- `binding_digest` as SHA-256 over JCS of `{scope, target, mission_ref,
+  assignment_ref, lease_ref, fencing_token, safety_envelope_ref, authority_ref,
+  approval_ref, validity, resource_limits, observation_refs,
+  idempotency_retention_seconds}`;
 - `node_boot_epoch` and `fencing_token` (fence values start at 1);
 - a validity window on an authoritative clock (`authority-utc`);
 - resource limits;

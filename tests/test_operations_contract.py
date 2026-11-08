@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -7,6 +8,13 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / 'contracts/operations/v1/operations.openapi.json'
 FIXTURES = ROOT / 'contracts/operations/v1/fixtures'
 
+BINDING_FIELDS = [
+    'scope', 'target', 'mission_ref', 'assignment_ref', 'lease_ref',
+    'fencing_token', 'safety_envelope_ref', 'authority_ref', 'approval_ref',
+    'validity', 'resource_limits', 'observation_refs',
+    'idempotency_retention_seconds',
+]
+
 
 class SchemaError(AssertionError):
     pass
@@ -14,6 +22,34 @@ class SchemaError(AssertionError):
 
 def load(path):
     return json.loads(path.read_text())
+
+
+def canonical(value):
+    if isinstance(value, dict):
+        return '{' + ','.join(
+            json.dumps(key, ensure_ascii=False) + ':' + canonical(value[key])
+            for key in sorted(value)
+        ) + '}'
+    if isinstance(value, list):
+        return '[' + ','.join(canonical(item) for item in value) + ']'
+    if isinstance(value, bool):
+        return 'true' if value else 'false'
+    if value is None:
+        return 'null'
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, float):
+        if value == int(value) and abs(value) < 1e21:
+            return str(int(value))
+        return repr(value)
+    if isinstance(value, str):
+        return json.dumps(value, ensure_ascii=False)
+    raise TypeError(type(value))
+
+
+def binding_digest(document, fields):
+    binding = {name: document[name] for name in fields}
+    return 'sha256:' + hashlib.sha256(canonical(binding).encode('utf-8')).hexdigest()
 
 
 def resolve(root, schema):
@@ -172,6 +208,14 @@ class OperationsContractTests(unittest.TestCase):
         self.assertIn('confirmed_no_effect', operation['properties']['execution_status']['enum'])
         self.assertIn('stop_confirmed', operation['properties']['cancellation_status']['enum'])
         self.assertIn('verified', operation['properties']['effect_status']['enum'])
+
+    def test_binding_digest_covers_all_immutable_effective_fields(self):
+        binding = self.schemas['SubmitOperationRequest']['properties']['binding_digest']
+        self.assertEqual(binding.get('x-binding-fields'), BINDING_FIELDS)
+
+    def test_valid_submit_binding_digest_matches_fixture(self):
+        document = load(FIXTURES / 'valid' / 'submit-navigate.json')
+        self.assertEqual(document['binding_digest'], binding_digest(document, BINDING_FIELDS))
 
     def test_submit_bindings(self):
         request = self.schemas['SubmitOperationRequest']
