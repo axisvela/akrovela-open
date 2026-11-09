@@ -9,6 +9,7 @@ from test_operations_contract import SchemaError, load, validate
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / 'contracts/satellite/v1/satellite.schema.json'
 FIXTURES = ROOT / 'contracts/satellite/v1/fixtures'
+VECTORS = ROOT / 'contracts/satellite/v1/vectors/semantic-vectors.json'
 
 
 class SatelliteContractTests(unittest.TestCase):
@@ -60,6 +61,25 @@ class SatelliteContractTests(unittest.TestCase):
                      'contract_mode'):
             self.assertIn(name, body['required'])
         self.assertEqual(body['properties']['contract_mode']['const'], 'fixture')
+
+    def test_semantic_vectors(self):
+        document = load(VECTORS)
+        self.assertEqual(document['protocol_version'], 'akrovela.satellite/v1')
+        codes = set(self.defs['ErrorCode']['enum'])
+        names = set()
+        for vector in document['vectors']:
+            self.assertIn('name', vector)
+            names.add(vector['name'])
+            self.assertIn('message', vector)
+            self.assertIn('now', vector)
+            self.assertIn('clock_uncertainty_ms', vector)
+            code = vector['expect_code']
+            self.assertTrue(code == '' or code in codes, code)
+        self.assertIn('valid', names)
+        self.assertIn('expired-dispatch', names)
+        self.assertIn('binding-digest-mismatch', names)
+        valid = next(vector for vector in document['vectors'] if vector['name'] == 'valid')
+        validate(valid['message'], self.defs['SubmitMessage'], self.spec)
 
     def test_valid_fixtures(self):
         for path in sorted((FIXTURES / 'valid').glob('*.json')):
