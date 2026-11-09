@@ -59,5 +59,17 @@ From the repository root: `python -m unittest discover -s tests -v`.
 `sdk/go/sdkparity` compares schema properties with Go json tags in both directions
 so an unreviewed field cannot silently appear in the SDK.
 
-Publishing the nested module needs `sdk/go/vX.Y.Z`, separately from product root
-tags. No tag or registry availability is claimed here.
+## Versioning and Compatibility
+
+The nested module uses `sdk/go/vX.Y.Z` tags, separate from product root tags.
+While the product is `0.x`, SDK breaking changes are allowed in a minor release,
+but must be documented in `CHANGELOG.md` and reflected in fixture tests.
+
+- `operationsv1` and `satellitev1` follow reviewed public contracts.
+- `offlineadmissionv1` is experimental and may change without a contract review of
+  its own; do not publish it as stable.
+- A module tag is a publication decision, not an automatic consequence of a
+  product commit. It requires a clean-checkout `go test/vet/build` run and release
+  notes that exclude production/device/enablement claims.
+
+No tag or registry availability is currently claimed.
