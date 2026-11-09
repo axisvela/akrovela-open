@@ -1,0 +1,16 @@
+{
+  "protocol_version": "akrovela.satellite/v1",
+  "message_type": "local_admission_ack",
+  "message_id": "msg:facts-ack-1",
+  "session_id": "session:coordinator-1",
+  "sequence": 5,
+  "tenant_id": "tenant-acme",
+  "workspace_id": "wh3",
+  "site_id": "site-wh3",
+  "satellite_id": "akrovela-node-wh3-01",
+  "source_epoch": 7,
+  "coordinator_id": "coordinator-wh3-01",
+  "coordinator_epoch": 4,
+  "sent_at": "2026-11-09T10:01:01Z",
+  "body": {"namespace": "akrovela-wh3", "admission_source_epoch": 7, "acked_through_sequence": 1}
+}

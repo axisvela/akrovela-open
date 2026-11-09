@@ -1,0 +1,15 @@
+{
+  "aegivela_revision": "684886a1f62e5e8f2159250a584ccd8e4187f667",
+  "aegivela_contract": "aegivela.io/offline-admission/v1.0",
+  "source": "contracts/offline-admission/v1.0/fixtures/consumer/acceptance.json",
+  "execution_status": "not-executed",
+  "consumer_cases": [
+    "valid-admit", "unknown-key", "audience-mismatch", "device-epoch-mismatch",
+    "operation-not-allowed", "clock-deadline", "no-reservation",
+    "concurrent-final-credit", "identical-retry", "conflicting-retry",
+    "persistence-failure", "uncertain-commit", "crash-before-start-intent",
+    "crash-after-start-intent", "restart-started-not-terminal",
+    "drain-before-new-work", "journal-rollback", "device-clone",
+    "parent-revoked-disconnected", "late-receipt-after-revocation"
+  ]
+}

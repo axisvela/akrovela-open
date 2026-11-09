@@ -110,6 +110,10 @@ def matches(value, schema, root):
 
 def validate(value, schema, root):
     schema = resolve(root, schema)
+    if 'oneOf' in schema:
+        count = sum(matches(value, child, root) for child in schema['oneOf'])
+        if count != 1:
+            raise SchemaError(f'expected exactly one matching schema, got {count}')
     if 'allOf' in schema:
         for child in schema['allOf']:
             validate(value, child, root)
@@ -155,6 +159,12 @@ def validate(value, schema, root):
     if isinstance(value, list):
         if len(value) < schema.get('minItems', 0):
             raise SchemaError('too few items')
+        if 'maxItems' in schema and len(value) > schema['maxItems']:
+            raise SchemaError('too many items')
+        if schema.get('uniqueItems') and any(
+            item in value[:index] for index, item in enumerate(value)
+        ):
+            raise SchemaError('duplicate items')
         if 'items' in schema:
             for item in value:
                 validate(item, schema['items'], root)

@@ -1,0 +1,42 @@
+{
+  "protocol_version": "akrovela.satellite/v1",
+  "message_type": "local_admission_batch",
+  "message_id": "msg:facts-1",
+  "session_id": "session:coordinator-1",
+  "sequence": 4,
+  "tenant_id": "tenant-acme",
+  "workspace_id": "wh3",
+  "site_id": "site-wh3",
+  "satellite_id": "akrovela-node-wh3-01",
+  "source_epoch": 7,
+  "coordinator_id": "coordinator-wh3-01",
+  "coordinator_epoch": 4,
+  "sent_at": "2026-11-09T10:01:00Z",
+  "body": {
+    "aegivela_revision": "684886a1f62e5e8f2159250a584ccd8e4187f667",
+    "namespace": "akrovela-wh3",
+    "admission_source_epoch": 7,
+    "facts": [{
+      "fact_id": "fact:one",
+      "admission_id": "admission:one",
+      "namespace": "akrovela-wh3",
+      "offline_grant_id": "offline-fixture-1",
+      "artifact_digest": "78465f5cc0e920b0fcc30b783692a08713503d3cc5ab58445556cfe75a855429",
+      "operation_key": "op:one",
+      "attempt_id": "attempt:one",
+      "authority_binding_digest": "009f73c64d761e783c0f2b5b630dbaf52fc1b40706a26dcd75cb95f5de696d72",
+      "authority_payload_digest": "cdc89183848054771e62c44279dc4342ea4d0af69b34a6aa232473cc0752deab",
+      "operation_binding_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "operation_payload_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "sequence": 1,
+      "state": "unknown",
+      "reserved_resources": {
+        "operations": 1,
+        "duration_ms": 5000,
+        "goal_distance_mm": 2000,
+        "path_length_mm": 4000
+      },
+      "recorded_at": "2026-11-09T10:00:30Z"
+    }]
+  }
+}

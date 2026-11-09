@@ -87,3 +87,11 @@ Listening on a socket is not authentication.
 
 Maximum frame 1 MiB, command queue 256, receipt batch 100. These are product
 settings, not safety limits.
+
+## Offline Admission Candidate
+
+The [F4b companion mapping](../contracts/satellite/v1/offline-admission/README.md)
+and [candidate schema](../contracts/satellite/v1/offline-admission.schema.json)
+are proposed, not reviewed or enabled. They pin AEGIVELA offline-admission v1.0
+and require explicit capability negotiation; they do not widen the existing v1
+message set. The 20 upstream consumer acceptance cases have not been executed.

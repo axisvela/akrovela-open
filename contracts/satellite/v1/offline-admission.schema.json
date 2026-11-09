@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://axisvela.github.io/akrovela/contracts/satellite/v1/offline-admission.schema.json",
+  "title": "AKROVELA Satellite F4b Candidate Extension",
+  "x-contract-status": "proposed",
+  "x-required-capability": "offline_admission_v1",
+  "x-aegivela-revision": "684886a1f62e5e8f2159250a584ccd8e4187f667",
+  "description": "Candidate transport schema, not owner-approved or enabled. Structural validation is not authorization, device proof, capability negotiation or digest verification.",
+  "allOf": [{"$ref": "#/$defs/Envelope"}],
+  "oneOf": [
+    {"properties": {"message_type": {"const": "hello_ack"}, "body": {"$ref": "#/$defs/CapabilityAck"}}},
+    {"properties": {"message_type": {"const": "offline_grant"}, "body": {"$ref": "#/$defs/OfflineGrant"}}},
+    {"properties": {"message_type": {"const": "offline_grant_ack"}, "body": {"$ref": "#/$defs/OfflineGrantAck"}}},
+    {"properties": {"message_type": {"const": "local_admission_batch"}, "body": {"$ref": "#/$defs/AdmissionBatch"}}},
+    {"properties": {"message_type": {"const": "local_admission_ack"}, "body": {"$ref": "#/$defs/AdmissionAck"}}}
+  ],
+  "$defs": {
+    "ScopeId": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "Nonempty": {"type": "string", "minLength": 1},
+    "AuthorityDigest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "OperationDigest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "Sequence": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+    "Counter": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+    "DateTime": {"type": "string", "format": "date-time"},
+    "CompactArtifact": {"type": "string", "pattern": "^[A-Za-z0-9_-]+[.][A-Za-z0-9_-]+[.][A-Za-z0-9_-]+$"},
+    "Envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol_version", "message_type", "message_id", "session_id", "sequence", "tenant_id", "workspace_id", "site_id", "satellite_id", "source_epoch", "coordinator_id", "coordinator_epoch", "sent_at", "body"],
+      "properties": {
+        "protocol_version": {"const": "akrovela.satellite/v1"},
+        "message_type": {"enum": ["hello_ack", "offline_grant", "offline_grant_ack", "local_admission_batch", "local_admission_ack"]},
+        "message_id": {"type": "string", "pattern": "^msg:[A-Za-z0-9._~-]+$"},
+        "session_id": {"type": "string", "pattern": "^session:[A-Za-z0-9._~-]+$"},
+        "sequence": {"$ref": "#/$defs/Sequence"},
+        "tenant_id": {"$ref": "#/$defs/ScopeId"},
+        "workspace_id": {"$ref": "#/$defs/ScopeId"},
+        "site_id": {"$ref": "#/$defs/ScopeId"},
+        "satellite_id": {"$ref": "#/$defs/ScopeId"},
+        "source_epoch": {"$ref": "#/$defs/Sequence"},
+        "coordinator_id": {"$ref": "#/$defs/ScopeId"},
+        "coordinator_epoch": {"$ref": "#/$defs/Sequence"},
+        "sent_at": {"$ref": "#/$defs/DateTime"},
+        "body": {"type": "object"}
+      }
+    },
+    "CapabilityAck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol_version", "accepted", "capabilities"],
+      "properties": {
+        "protocol_version": {"const": "akrovela.satellite/v1"},
+        "accepted": {"type": "boolean", "const": true},
+        "capabilities": {"type": "array", "minItems": 1, "maxItems": 1, "uniqueItems": true, "items": {"const": "offline_admission_v1"}}
+      }
+    },
+    "OfflineGrant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aegivela_revision", "signed_offline_grant", "signed_parent_grant", "artifact_digest"],
+      "properties": {
+        "aegivela_revision": {"const": "684886a1f62e5e8f2159250a584ccd8e4187f667"},
+        "signed_offline_grant": {"$ref": "#/$defs/CompactArtifact"},
+        "signed_parent_grant": {"$ref": "#/$defs/CompactArtifact"},
+        "artifact_digest": {"$ref": "#/$defs/AuthorityDigest"}
+      }
+    },
+    "OfflineGrantAck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_digest", "status", "recorded_at"],
+      "properties": {
+        "artifact_digest": {"$ref": "#/$defs/AuthorityDigest"},
+        "status": {"enum": ["persisted", "rejected"]},
+        "recorded_at": {"$ref": "#/$defs/DateTime"},
+        "reason": {"$ref": "#/$defs/Nonempty"}
+      }
+    },
+    "ReservedResources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operations", "duration_ms", "goal_distance_mm", "path_length_mm"],
+      "properties": {
+        "operations": {"const": 1, "type": "integer"},
+        "duration_ms": {"$ref": "#/$defs/Counter"},
+        "goal_distance_mm": {"$ref": "#/$defs/Counter"},
+        "path_length_mm": {"$ref": "#/$defs/Counter"}
+      }
+    },
+    "AdmissionFact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fact_id", "admission_id", "namespace", "offline_grant_id", "artifact_digest", "operation_key", "attempt_id", "authority_binding_digest", "authority_payload_digest", "operation_binding_digest", "operation_payload_digest", "sequence", "state", "reserved_resources", "recorded_at"],
+      "properties": {
+        "fact_id": {"type": "string", "pattern": "^fact:[A-Za-z0-9._~-]+$"},
+        "admission_id": {"type": "string", "pattern": "^admission:[A-Za-z0-9._~-]+$"},
+        "namespace": {"$ref": "#/$defs/Nonempty"},
+        "offline_grant_id": {"$ref": "#/$defs/Nonempty"},
+        "artifact_digest": {"$ref": "#/$defs/AuthorityDigest"},
+        "operation_key": {"type": "string", "pattern": "^op:[A-Za-z0-9._~-]+$"},
+        "attempt_id": {"type": "string", "pattern": "^attempt:[A-Za-z0-9._~-]+$"},
+        "authority_binding_digest": {"$ref": "#/$defs/AuthorityDigest"},
+        "authority_payload_digest": {"$ref": "#/$defs/AuthorityDigest"},
+        "operation_binding_digest": {"$ref": "#/$defs/OperationDigest"},
+        "operation_payload_digest": {"$ref": "#/$defs/OperationDigest"},
+        "sequence": {"$ref": "#/$defs/Sequence"},
+        "state": {"enum": ["admitted", "start_intent", "terminal", "unknown", "quarantined"]},
+        "reserved_resources": {"$ref": "#/$defs/ReservedResources"},
+        "recorded_at": {"$ref": "#/$defs/DateTime"}
+      }
+    },
+    "AdmissionBatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aegivela_revision", "namespace", "admission_source_epoch", "facts"],
+      "properties": {
+        "aegivela_revision": {"const": "684886a1f62e5e8f2159250a584ccd8e4187f667"},
+        "namespace": {"$ref": "#/$defs/Nonempty"},
+        "admission_source_epoch": {"$ref": "#/$defs/Sequence"},
+        "facts": {"type": "array", "minItems": 1, "maxItems": 100, "items": {"$ref": "#/$defs/AdmissionFact"}}
+      }
+    },
+    "AdmissionAck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespace", "admission_source_epoch", "acked_through_sequence"],
+      "properties": {
+        "namespace": {"$ref": "#/$defs/Nonempty"},
+        "admission_source_epoch": {"$ref": "#/$defs/Sequence"},
+        "acked_through_sequence": {"$ref": "#/$defs/Counter"}
+      }
+    }
+  }
+}

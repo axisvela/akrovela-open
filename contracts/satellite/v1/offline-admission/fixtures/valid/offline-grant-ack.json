@@ -1,0 +1,20 @@
+{
+  "protocol_version": "akrovela.satellite/v1",
+  "message_type": "offline_grant_ack",
+  "message_id": "msg:grant-ack-1",
+  "session_id": "session:coordinator-1",
+  "sequence": 3,
+  "tenant_id": "tenant-acme",
+  "workspace_id": "wh3",
+  "site_id": "site-wh3",
+  "satellite_id": "akrovela-node-wh3-01",
+  "source_epoch": 7,
+  "coordinator_id": "coordinator-wh3-01",
+  "coordinator_epoch": 4,
+  "sent_at": "2026-11-09T10:00:01Z",
+  "body": {
+    "artifact_digest": "78465f5cc0e920b0fcc30b783692a08713503d3cc5ab58445556cfe75a855429",
+    "status": "persisted",
+    "recorded_at": "2026-11-09T10:00:01Z"
+  }
+}
