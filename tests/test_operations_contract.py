@@ -334,6 +334,18 @@ class OperationsContractTests(unittest.TestCase):
         for path in sorted((FIXTURES / 'valid').glob('*.json')):
             validate(load(path), self.schemas[schema_names[path.stem]], self.spec)
 
+    def test_verified_effect_requires_verified_verifier(self):
+        receipt = load(FIXTURES / 'valid' / 'receipt.json')
+        self.assertEqual(receipt['effect_status'], 'verified')
+        self.assertEqual(receipt['verifier']['result'], 'verified')
+        self.assertGreaterEqual(len(receipt['observations']), 1)
+        invalid = load(
+            FIXTURES / 'invalid' / 'receipt-verified-with-unknown-verifier.json'
+        )
+        invalid.pop('_schema')
+        with self.assertRaises(SchemaError):
+            validate(invalid, self.schemas['Receipt'], self.spec)
+
     def test_invalid_fixtures_rejected(self):
         for path in sorted((FIXTURES / 'invalid').glob('*.json')):
             document = load(path)
