@@ -1,0 +1,31 @@
+{
+  "_schema": "ConsumptionBatchMessage",
+  "protocol_version": "akrovela.satellite/v1",
+  "message_type": "consumption_batch",
+  "message_id": "msg:consumption-batch-1",
+  "session_id": "session:coordinator-1",
+  "sequence": 12,
+  "tenant_id": "tenant-acme",
+  "workspace_id": "wh3",
+  "site_id": "site-wh3",
+  "satellite_id": "akrovela-node-wh3-01",
+  "source_epoch": 7,
+  "coordinator_id": "coordinator-wh3-01",
+  "coordinator_epoch": 4,
+  "sent_at": "2026-11-08T13:00:00Z",
+  "body": {
+    "satellite_id": "akrovela-node-wh3-01",
+    "consumptions": [
+      {
+        "consumption_id": "consumption:0192f300-2b3c-7d4e-8f5a-6b7c8d9e0f11",
+        "allocation_id": "alloc:0192f200-1a2b-7c3d-8e4f-5a6b7c8d9e0f",
+        "operation_key": "op:0192f0f2-7d6f-7c2a-9d1e-2b6f0f7a9c31",
+        "attempt_id": "attempt:0192f102-1b2c-7d3e-8f4a-5b6c7d8e9f00",
+        "consumed_at": "2026-11-08T12:30:00Z",
+        "sequence": 1,
+        "digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "receipt_ref": "satreceipt:1"
+      }
+    ]
+  }
+}

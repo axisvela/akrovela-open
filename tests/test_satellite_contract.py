@@ -29,10 +29,19 @@ class SatelliteContractTests(unittest.TestCase):
             'CancelMessage', 'CancelResultMessage', 'ReceiptBatchMessage',
             'ReceiptAckMessage', 'HeartbeatMessage', 'StatusMessage',
             'StatusResultMessage', 'ResumeMessage', 'ResumeResultMessage',
+            'PreReleaseMessage', 'PreReleaseAckMessage', 'ConsumptionBatchMessage',
+            'ConsumptionAckMessage', 'PreReleaseBody', 'ConsumptionBatchBody',
             'EnvelopeBase', 'SubmitBody', 'Target', 'Validity', 'ResourceLimits',
             'ErrorCode',
         ):
             self.assertIn(name, self.defs)
+
+    def test_pre_release_requires_budget(self):
+        body = self.defs['PreReleaseBody']
+        for name in ('allocation_id', 'count_budget', 'resource_budget',
+                     'binding_digest', 'dispatch_not_after', 'contract_mode'):
+            self.assertIn(name, body['required'])
+        self.assertEqual(body['properties']['contract_mode']['const'], 'fixture')
 
     def test_error_code_set(self):
         codes = set(self.defs['ErrorCode']['enum'])

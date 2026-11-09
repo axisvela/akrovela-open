@@ -1,0 +1,21 @@
+{
+  "_schema": "PreReleaseAckMessage",
+  "protocol_version": "akrovela.satellite/v1",
+  "message_type": "pre_release_ack",
+  "message_id": "msg:pre-release-ack-1",
+  "session_id": "session:coordinator-1",
+  "sequence": 11,
+  "tenant_id": "tenant-acme",
+  "workspace_id": "wh3",
+  "site_id": "site-wh3",
+  "satellite_id": "akrovela-node-wh3-01",
+  "source_epoch": 7,
+  "coordinator_id": "coordinator-wh3-01",
+  "coordinator_epoch": 4,
+  "sent_at": "2026-11-08T12:00:00Z",
+  "body": {
+    "allocation_id": "alloc:0192f200-1a2b-7c3d-8e4f-5a6b7c8d9e0f",
+    "accepted": true,
+    "persisted_at": "2026-11-08T12:00:00Z"
+  }
+}

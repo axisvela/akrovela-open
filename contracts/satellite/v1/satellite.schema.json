@@ -21,7 +21,7 @@
       ],
       "properties": {
         "protocol_version": {"const": "akrovela.satellite/v1"},
-        "message_type": {"type": "string", "enum": ["hello", "hello_ack", "resume", "resume_result", "submit", "submit_result", "status", "status_result", "cancel", "cancel_result", "receipt_batch", "receipt_ack", "heartbeat"]},
+        "message_type": {"type": "string", "enum": ["hello", "hello_ack", "resume", "resume_result", "submit", "submit_result", "status", "status_result", "cancel", "cancel_result", "receipt_batch", "receipt_ack", "pre_release", "pre_release_ack", "consumption_batch", "consumption_ack", "heartbeat"]},
         "message_id": {"$ref": "#/$defs/MessageId"},
         "session_id": {"$ref": "#/$defs/SessionId"},
         "sequence": {"type": "integer", "minimum": 1},
@@ -304,6 +304,103 @@
     "ResumeMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "resume"}, "body": {"$ref": "#/$defs/ResumeBody"}}, "required": ["message_type", "body"]}]},
     "ResumeResultMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "resume_result"}, "body": {"$ref": "#/$defs/ResumeResultBody"}}, "required": ["message_type", "body"]}]},
     "ReceiptAckMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "receipt_ack"}, "body": {"$ref": "#/$defs/ReceiptAckBody"}}, "required": ["message_type", "body"]}]},
+    "ResourceBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_duration_ms", "max_goal_distance_m", "max_path_length_m", "max_speed_mps", "max_payload_bytes"],
+      "properties": {
+        "max_duration_ms": {"type": "integer", "minimum": 1},
+        "max_goal_distance_m": {"type": "number", "minimum": 0},
+        "max_path_length_m": {"type": "number", "minimum": 0},
+        "max_speed_mps": {"type": "number", "minimum": 0},
+        "max_payload_bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "PreReleaseBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allocation_id", "operation_key", "attempt_id", "operation_type",
+        "payload_digest", "binding_digest", "payload", "target", "mission_ref",
+        "assignment_ref", "lease_ref", "fencing_token", "safety_envelope_ref",
+        "authority_ref", "approval_ref", "validity", "resource_limits",
+        "observation_refs", "idempotency_retention_seconds", "dispatch_not_after",
+        "contract_mode", "count_budget", "resource_budget"
+      ],
+      "properties": {
+        "allocation_id": {"type": "string", "pattern": "^alloc:[A-Za-z0-9._~-]+$"},
+        "operation_key": {"type": "string", "pattern": "^op:[A-Za-z0-9._~-]+$"},
+        "attempt_id": {"type": "string", "pattern": "^attempt:[A-Za-z0-9._~-]+$"},
+        "operation_type": {"const": "ros2.nav2.navigate_to_pose@1"},
+        "payload_digest": {"$ref": "#/$defs/Digest"},
+        "binding_digest": {"$ref": "#/$defs/Digest"},
+        "payload": {"$ref": "#/$defs/NavigatePayload"},
+        "target": {"$ref": "#/$defs/Target"},
+        "mission_ref": {"type": "string", "pattern": "^mission:[A-Za-z0-9._~:/-]+$"},
+        "assignment_ref": {"type": "string", "pattern": "^assignment:[A-Za-z0-9._~:/-]+$"},
+        "lease_ref": {"type": "string", "pattern": "^lease:[A-Za-z0-9._~:/-]+$"},
+        "fencing_token": {"type": "integer", "minimum": 1},
+        "safety_envelope_ref": {"type": "string", "pattern": "^safe:[A-Za-z0-9._~:/-]+$"},
+        "authority_ref": {"type": "string", "pattern": "^grant:[A-Za-z0-9._~:/-]+$"},
+        "approval_ref": {"type": "string", "pattern": "^approval:[A-Za-z0-9._~:/-]+$"},
+        "validity": {"$ref": "#/$defs/Validity"},
+        "resource_limits": {"$ref": "#/$defs/ResourceLimits"},
+        "observation_refs": {"type": "array", "maxItems": 0},
+        "idempotency_retention_seconds": {"type": "integer", "minimum": 1, "maximum": 31536000},
+        "dispatch_not_after": {"$ref": "#/$defs/DateTime"},
+        "contract_mode": {"const": "fixture"},
+        "count_budget": {"type": "integer", "minimum": 1, "maximum": 1000},
+        "resource_budget": {"$ref": "#/$defs/ResourceBudget"}
+      }
+    },
+    "PreReleaseAckBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allocation_id", "accepted", "persisted_at"],
+      "properties": {
+        "allocation_id": {"type": "string", "pattern": "^alloc:[A-Za-z0-9._~-]+$"},
+        "accepted": {"type": "boolean"},
+        "reason": {"type": "string"},
+        "persisted_at": {"$ref": "#/$defs/DateTime"}
+      }
+    },
+    "ConsumptionBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consumption_id", "allocation_id", "operation_key", "attempt_id", "consumed_at", "sequence", "digest"],
+      "properties": {
+        "consumption_id": {"type": "string", "pattern": "^consumption:[A-Za-z0-9._~-]+$"},
+        "allocation_id": {"type": "string", "pattern": "^alloc:[A-Za-z0-9._~-]+$"},
+        "operation_key": {"type": "string", "pattern": "^op:[A-Za-z0-9._~-]+$"},
+        "attempt_id": {"type": "string", "pattern": "^attempt:[A-Za-z0-9._~-]+$"},
+        "consumed_at": {"$ref": "#/$defs/DateTime"},
+        "sequence": {"type": "integer", "minimum": 1},
+        "digest": {"$ref": "#/$defs/Digest"},
+        "receipt_ref": {"type": "string"}
+      }
+    },
+    "ConsumptionBatchBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["satellite_id", "consumptions"],
+      "properties": {
+        "satellite_id": {"$ref": "#/$defs/ScopeId"},
+        "consumptions": {"type": "array", "minItems": 1, "maxItems": 100, "items": {"$ref": "#/$defs/ConsumptionBody"}}
+      }
+    },
+    "ConsumptionAckBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["satellite_id", "acked_through_sequence"],
+      "properties": {
+        "satellite_id": {"$ref": "#/$defs/ScopeId"},
+        "acked_through_sequence": {"type": "integer", "minimum": 0}
+      }
+    },
+    "PreReleaseMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "pre_release"}, "body": {"$ref": "#/$defs/PreReleaseBody"}}, "required": ["message_type", "body"]}]},
+    "PreReleaseAckMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "pre_release_ack"}, "body": {"$ref": "#/$defs/PreReleaseAckBody"}}, "required": ["message_type", "body"]}]},
+    "ConsumptionBatchMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "consumption_batch"}, "body": {"$ref": "#/$defs/ConsumptionBatchBody"}}, "required": ["message_type", "body"]}]},
+    "ConsumptionAckMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "consumption_ack"}, "body": {"$ref": "#/$defs/ConsumptionAckBody"}}, "required": ["message_type", "body"]}]},
     "ErrorCode": {
       "type": "string",
       "enum": [

@@ -11,4 +11,6 @@
   exact-operation tools without changing the v1 wire schema or SDK.
 - Add the reviewed satellite command protocol v1, fixtures and review record;
   fixture-mode only, no live/ROS/effect claim.
+- Add the F4a offline pre-release and consumption messages to the satellite
+  contract; coordinator-allocated budgets only, no satellite-local admission.
 - No published SDK package, core binary or execution implementation is claimed.
