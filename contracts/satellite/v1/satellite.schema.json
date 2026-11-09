@@ -412,7 +412,8 @@
         "message_replayed", "queue_full", "frame_too_large", "invalid_request",
         "cancel_not_possible", "unknown_outcome", "dependency_unavailable",
         "not_found", "approval_consumed", "stale_node_boot_epoch",
-        "not_yet_valid", "expired", "reconciliation_required", "action_in_progress"
+        "not_yet_valid", "expired", "reconciliation_required", "action_in_progress",
+        "drain_required"
       ]
     }
   }
