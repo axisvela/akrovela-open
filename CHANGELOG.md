@@ -1,8 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.1.0 - 2026-11-09
 
 - Bootstrap operational OpenAPI, dependency-free Go client and source example.
+- Add the public Go SDK packages `operationsv1` and `satellitev1` with strict JSON
+  codecs, plus the experimental `offlineadmissionv1` transport types; schema/Go
+  field parity is tested both ways. No network client, signature verification,
+  authorization or device trust is included.
 - Add reviewed v1 local operation/receipt contract, valid and invalid fixtures,
   and public usage; no executor, database or live KINETOVELA integration.
 - Correct the unreleased v1 binding digest to cover resource limits, observation
