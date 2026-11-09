@@ -30,8 +30,9 @@ It is not a published-package consumer check. Operational API:
 [contracts/bootstrap.openapi.json](contracts/bootstrap.openapi.json). Local
 operation/receipt contract:
 [contracts/operations/v1/operations.openapi.json](contracts/operations/v1/operations.openapi.json).
-Public usage: [docs/README.md](docs/README.md) and
-[operation contract usage](docs/operations.md).
+Public usage: [docs/README.md](docs/README.md),
+[operation contract usage](docs/operations.md) and the
+[public Go SDK](docs/sdk.md).
 
 Apache-2.0 covers this repository's original source, not imported core binaries.
 Future release bundles must retain AGPL notices, matching corresponding source,
