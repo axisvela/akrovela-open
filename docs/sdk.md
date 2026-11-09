@@ -56,6 +56,8 @@ submit, err := satellitev1.DecodeBody[satellitev1.SubmitBody](envelope)
 
 From `sdk/go`: `go test ./...`, `go vet ./...`, `go build ./...`.
 From the repository root: `python -m unittest discover -s tests -v`.
+`sdk/go/sdkparity` compares schema properties with Go json tags in both directions
+so an unreviewed field cannot silently appear in the SDK.
 
 Publishing the nested module needs `sdk/go/vX.Y.Z`, separately from product root
 tags. No tag or registry availability is claimed here.

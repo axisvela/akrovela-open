@@ -124,10 +124,9 @@ type HelloBody struct {
 }
 
 type HelloAckBody struct {
-	ProtocolVersion string   `json:"protocol_version"`
-	Accepted        bool     `json:"accepted"`
-	Capabilities    []string `json:"capabilities,omitempty"`
-	Reason          string   `json:"reason,omitempty"`
+	ProtocolVersion string `json:"protocol_version"`
+	Accepted        bool   `json:"accepted"`
+	Reason          string `json:"reason,omitempty"`
 }
 
 type ResumeBody struct {
