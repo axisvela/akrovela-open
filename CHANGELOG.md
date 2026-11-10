@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 - 2026-11-10
 
 - Extend the reviewed satellite v1 contract for F4a multi-execution budgets:
   optional `pre_release` execution model, budget mode, ack/exhaustion/capability
