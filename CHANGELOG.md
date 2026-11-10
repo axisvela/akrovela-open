@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Review post-attempt observation binding and tighten the receipt contract:
+  `effect_status=verified` requires a verified, independent verifier, at least
+  one accepted observation and `freshness_decision=accepted` on every recorded
+  observation. Add `receipt-verified-with-unknown-verifier.json` and
+  `receipt-verified-with-stale-observation.json` negative fixtures. No wire
+  schema widening.
+
 ## 0.1.0 - 2026-11-09
 
 - Bootstrap operational OpenAPI, dependency-free Go client and source example.
