@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 - 2026-11-11
+
+- Align the public version with core `0.3.0`. No public contract or SDK behavior
+  change; the reviewed v1 operation and satellite contracts are carried forward.
+  Core `0.3.0` adds the F5b arrival verifier process and cancel/restart
+  reconciliation without a public wire change.
+
 ## 0.2.0 - 2026-11-10
 
 - Extend the reviewed satellite v1 contract for F4a multi-execution budgets:
