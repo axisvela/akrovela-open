@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "AKROVELA Local Operation API",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "x-contract-version": "v1",
     "x-contract-status": "reviewed",
     "x-review-ref": "review.md",

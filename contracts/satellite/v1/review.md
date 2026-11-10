@@ -10,11 +10,13 @@ not external sign-off, runtime conformance or a security certification.
 | Contract | `contracts/satellite/v1/satellite.schema.json` |
 | Contract line | `v1` |
 | Protocol version | `akrovela.satellite/v1` |
-| Product version | `0.2.0` |
+| Product version | `0.3.0` |
 | Mode | Deterministic fixture only |
 
 The original review was performed at product `0.1.0`. The additive F4a
-multi-execution amendments were reviewed for `0.2.0` without a breaking wire change.
+multi-execution amendments were reviewed for `0.2.0` without a breaking wire
+change. No satellite-contract change was made for `0.3.0`; the reviewed contract
+is carried forward.
 
 ## Approved Decisions
 
