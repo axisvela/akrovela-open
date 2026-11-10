@@ -346,6 +346,22 @@ class OperationsContractTests(unittest.TestCase):
         with self.assertRaises(SchemaError):
             validate(invalid, self.schemas['Receipt'], self.spec)
 
+    def test_verified_effect_requires_accepted_observation(self):
+        receipt = load(FIXTURES / 'valid' / 'receipt.json')
+        self.assertEqual(receipt['effect_status'], 'verified')
+        self.assertTrue(
+            all(
+                observation['freshness_decision'] == 'accepted'
+                for observation in receipt['observations']
+            )
+        )
+        invalid = load(
+            FIXTURES / 'invalid' / 'receipt-verified-with-stale-observation.json'
+        )
+        invalid.pop('_schema')
+        with self.assertRaises(SchemaError):
+            validate(invalid, self.schemas['Receipt'], self.spec)
+
     def test_invalid_fixtures_rejected(self):
         for path in sorted((FIXTURES / 'invalid').glob('*.json')):
             document = load(path)

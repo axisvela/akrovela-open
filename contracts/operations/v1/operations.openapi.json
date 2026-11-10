@@ -525,7 +525,14 @@
                   "required": ["result"],
                   "properties": {"result": {"const": "verified"}}
                 },
-                "observations": {"type": "array", "minItems": 1}
+                "observations": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "properties": {"freshness_decision": {"const": "accepted"}},
+                    "required": ["freshness_decision"]
+                  }
+                }
               }
             }
           },

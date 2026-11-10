@@ -90,12 +90,17 @@ receipt conditions explicit and adds one negative fixture.
   admission; they bind to the attempt after claim, through `attempt_id` and
   `execution_epoch` in the receipt's observation subject.
 - `effect_status=verified` requires `execution_status=completed`,
-  `verifier.result=verified` and at least one accepted observation. A verified
-  effect without a verified verifier result or without an accepted observation
-  is invalid (`receipt-verified-with-unknown-verifier.json`).
+  `verifier.result=verified`, an independent verifier result and at least one
+  accepted observation. Every observation recorded on a verified effect must
+  have `freshness_decision=accepted`. Invalid examples:
+  `receipt-verified-with-unknown-verifier.json` and
+  `receipt-verified-with-stale-observation.json`.
 - Missing, stale, replayed, wrong-robot or wrong-operation observations leave
   the effect `unknown`. Failures map to `unknown`, not success, unless a valid
-  observation shows the robot outside tolerance.
+  observation shows the robot outside tolerance. F5a enforces an accepted
+  observation with a non-empty `subject`; full observation-envelope, freshness
+  arithmetic, clock correspondence and target-digest binding validation remain
+  F5b gates.
 
 ## Residual Risks
 
