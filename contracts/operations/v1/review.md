@@ -10,10 +10,13 @@ security certification.
 | --- | --- |
 | Contract | `contracts/operations/v1/operations.openapi.json` |
 | Contract line | `v1` |
-| Product version | `0.1.0` |
+| Product version | `0.2.0` |
 | Consumer | KINETOVELA Site Gateway delegation in fixture mode |
 | Maintainer | AKROVELA maintainers |
 | Review method | Fresh-context review of contract, fixtures and authority boundaries |
+
+The original review was performed at product `0.1.0`. The additive F5 observation/
+effect amendments were reviewed for `0.2.0` without a breaking wire change.
 
 ## Ownership
 
