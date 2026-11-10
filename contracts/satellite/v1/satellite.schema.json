@@ -316,6 +316,17 @@
         "max_payload_bytes": {"type": "integer", "minimum": 1}
       }
     },
+    "ResourceUsage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["duration_ms", "goal_distance_m", "path_length_m", "payload_bytes"],
+      "properties": {
+        "duration_ms": {"type": "integer", "minimum": 0},
+        "goal_distance_m": {"type": "number", "minimum": 0},
+        "path_length_m": {"type": "number", "minimum": 0},
+        "payload_bytes": {"type": "integer", "minimum": 0}
+      }
+    },
     "PreReleaseBody": {
       "type": "object",
       "additionalProperties": false,
@@ -350,7 +361,12 @@
         "dispatch_not_after": {"$ref": "#/$defs/DateTime"},
         "contract_mode": {"const": "fixture"},
         "count_budget": {"type": "integer", "minimum": 1, "maximum": 1000},
-        "resource_budget": {"$ref": "#/$defs/ResourceBudget"}
+        "resource_budget": {"$ref": "#/$defs/ResourceBudget"},
+        "execution_model": {"type": "string", "enum": ["single_use", "satellite_attempts", "repeat_attempt"]},
+        "resource_budget_mode": {"type": "string", "enum": ["per_execution", "aggregate"]},
+        "ack_profile": {"type": "string", "enum": ["per_consumption", "batch"]},
+        "exhaustion_profile": {"type": "string", "enum": ["infer", "explicit_fact"]},
+        "capability_source": {"type": "string", "enum": ["persist_last_hello", "require_live_session", "caller_supplied"]}
       }
     },
     "PreReleaseAckBody": {
@@ -376,7 +392,10 @@
         "consumed_at": {"$ref": "#/$defs/DateTime"},
         "sequence": {"type": "integer", "minimum": 1},
         "digest": {"$ref": "#/$defs/Digest"},
-        "receipt_ref": {"type": "string"}
+        "receipt_ref": {"type": "string"},
+        "execution_index": {"type": "integer", "minimum": 1},
+        "repeat_of_attempt_id": {"type": "string", "pattern": "^attempt:[A-Za-z0-9._~-]+$"},
+        "resource_usage": {"$ref": "#/$defs/ResourceUsage"}
       }
     },
     "ConsumptionBatchBody": {
@@ -394,7 +413,22 @@
       "required": ["satellite_id", "acked_through_sequence"],
       "properties": {
         "satellite_id": {"$ref": "#/$defs/ScopeId"},
-        "acked_through_sequence": {"type": "integer", "minimum": 0}
+        "acked_through_sequence": {"type": "integer", "minimum": 0},
+        "results": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["consumption_id", "status"],
+            "properties": {
+              "consumption_id": {"type": "string", "pattern": "^consumption:[A-Za-z0-9._~-]+$"},
+              "status": {"type": "string", "enum": ["accepted", "duplicate", "rejected"]},
+              "reason": {"type": "string"}
+            }
+          }
+        },
+        "reason": {"type": "string"}
       }
     },
     "PreReleaseMessage": {"allOf": [{"$ref": "#/$defs/EnvelopeBase"}, {"type": "object", "properties": {"message_type": {"const": "pre_release"}, "body": {"$ref": "#/$defs/PreReleaseBody"}}, "required": ["message_type", "body"]}]},

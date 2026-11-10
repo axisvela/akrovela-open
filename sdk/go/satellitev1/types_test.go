@@ -35,6 +35,8 @@ func TestValidFixturesDecode(t *testing.T) {
 		"submit.json", "submit-result.json", "status.json", "status-result.json",
 		"cancel.json", "cancel-result.json", "receipt-batch.json", "receipt-ack.json",
 		"pre-release.json", "pre-release-ack.json", "consumption-batch.json", "consumption-ack.json",
+		"pre-release-multi.json", "pre-release-repeat.json",
+		"consumption-batch-indexed.json", "consumption-ack-results.json",
 		"heartbeat.json",
 	} {
 		t.Run(name, func(t *testing.T) {

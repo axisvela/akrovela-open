@@ -18,6 +18,23 @@ class SatelliteContractTests(unittest.TestCase):
         cls.spec = load(SCHEMA)
         cls.defs = cls.spec['$defs']
 
+    def valid_body(self, document):
+        schema_name = document['_schema']
+        body = document['body']
+        for part in self.defs[schema_name].get('allOf', ()):
+            ref = part.get('properties', {}).get('body', {}).get('$ref')
+            if ref is None:
+                continue
+            try:
+                validate(body, {'$ref': ref}, self.spec)
+            except SchemaError:
+                return False
+            if (body.get('execution_model') == 'repeat_attempt'
+                    and body.get('contract_mode') != 'fixture'):
+                return False
+            return True
+        raise SchemaError(f'{schema_name} has no body schema')
+
     def test_contract_identity(self):
         self.assertEqual(self.spec['x-contract-version'], 'v1')
         self.assertEqual(self.spec['x-contract-status'], 'reviewed')
@@ -42,6 +59,28 @@ class SatelliteContractTests(unittest.TestCase):
                      'binding_digest', 'dispatch_not_after', 'contract_mode'):
             self.assertIn(name, body['required'])
         self.assertEqual(body['properties']['contract_mode']['const'], 'fixture')
+
+    def test_pre_release_multi_fields(self):
+        body = load(FIXTURES / 'valid' / 'pre-release-multi.json')['body']
+        self.assertEqual(body['execution_model'], 'satellite_attempts')
+        self.assertEqual(body['resource_budget_mode'], 'aggregate')
+        self.assertEqual(body['count_budget'], 3)
+
+    def test_repeat_release_requires_fixture(self):
+        valid = load(FIXTURES / 'valid' / 'pre-release-repeat.json')['body']
+        self.assertEqual(valid['execution_model'], 'repeat_attempt')
+        invalid = load(FIXTURES / 'invalid' / 'pre-release-repeat-live.json')
+        self.assertFalse(self.valid_body(invalid))
+
+    def test_consumption_indexed_fields(self):
+        body = load(FIXTURES / 'valid' / 'consumption-batch-indexed.json')['body']
+        self.assertEqual(body['consumptions'][0]['execution_index'], 2)
+        self.assertEqual(body['consumptions'][0]['resource_usage']['duration_ms'], 60000)
+
+    def test_consumption_ack_results(self):
+        body = load(FIXTURES / 'valid' / 'consumption-ack-results.json')['body']
+        self.assertEqual(body['results'][0]['status'], 'accepted')
+        self.assertEqual(body['results'][1]['reason'], 'execution_index_conflict')
 
     def test_error_code_set(self):
         codes = set(self.defs['ErrorCode']['enum'])

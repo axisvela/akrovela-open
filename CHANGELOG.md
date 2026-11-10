@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Extend the reviewed satellite v1 contract for F4a multi-execution budgets:
+  optional `pre_release` execution model, budget mode, ack/exhaustion/capability
+  profiles; optional consumption `execution_index`, `repeat_of_attempt_id` and
+  `resource_usage`; optional `consumption_ack` per-item results and reason.
+  Additive only, fixture-mode evidence scope, no canonical-table change.
 - Review post-attempt observation binding and tighten the receipt contract:
   `effect_status=verified` requires a verified, independent verifier, at least
   one accepted observation and `freshness_decision=accepted` on every recorded

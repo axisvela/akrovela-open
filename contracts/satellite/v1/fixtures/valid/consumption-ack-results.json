@@ -1,0 +1,31 @@
+{
+  "_schema": "ConsumptionAckMessage",
+  "protocol_version": "akrovela.satellite/v1",
+  "message_type": "consumption_ack",
+  "message_id": "msg:consumption-ack-results",
+  "session_id": "session:coordinator-1",
+  "sequence": 13,
+  "tenant_id": "tenant-acme",
+  "workspace_id": "wh3",
+  "site_id": "site-wh3",
+  "satellite_id": "akrovela-node-wh3-01",
+  "source_epoch": 7,
+  "coordinator_id": "coordinator-wh3-01",
+  "coordinator_epoch": 4,
+  "sent_at": "2026-11-08T13:00:01Z",
+  "body": {
+    "satellite_id": "akrovela-node-wh3-01",
+    "acked_through_sequence": 1,
+    "results": [
+      {
+        "consumption_id": "consumption:0192f300-2b3c-7d4e-8f5a-6b7c8d9e0f11",
+        "status": "accepted"
+      },
+      {
+        "consumption_id": "consumption:0192f301-3c4d-7e5f-8a6b-7c8d9e0f1122",
+        "status": "rejected",
+        "reason": "execution_index_conflict"
+      }
+    ]
+  }
+}

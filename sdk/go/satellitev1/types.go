@@ -195,11 +195,23 @@ type ResourceBudget struct {
 	MaxPayloadBytes  int     `json:"max_payload_bytes"`
 }
 
+type ResourceUsage struct {
+	DurationMS    int64   `json:"duration_ms"`
+	GoalDistanceM float64 `json:"goal_distance_m"`
+	PathLengthM   float64 `json:"path_length_m"`
+	PayloadBytes  int     `json:"payload_bytes"`
+}
+
 type PreReleaseBody struct {
 	SubmitBody
-	AllocationID   string         `json:"allocation_id"`
-	CountBudget    int            `json:"count_budget"`
-	ResourceBudget ResourceBudget `json:"resource_budget"`
+	AllocationID       string         `json:"allocation_id"`
+	CountBudget        int            `json:"count_budget"`
+	ResourceBudget     ResourceBudget `json:"resource_budget"`
+	ExecutionModel     string         `json:"execution_model,omitempty"`
+	ResourceBudgetMode string         `json:"resource_budget_mode,omitempty"`
+	AckProfile         string         `json:"ack_profile,omitempty"`
+	ExhaustionProfile  string         `json:"exhaustion_profile,omitempty"`
+	CapabilitySource   string         `json:"capability_source,omitempty"`
 }
 
 type PreReleaseAckBody struct {
@@ -210,14 +222,17 @@ type PreReleaseAckBody struct {
 }
 
 type ConsumptionBody struct {
-	ConsumptionID string    `json:"consumption_id"`
-	AllocationID  string    `json:"allocation_id"`
-	OperationKey  string    `json:"operation_key"`
-	AttemptID     string    `json:"attempt_id"`
-	ConsumedAt    time.Time `json:"consumed_at"`
-	Sequence      int64     `json:"sequence"`
-	Digest        string    `json:"digest"`
-	ReceiptRef    string    `json:"receipt_ref,omitempty"`
+	ConsumptionID     string         `json:"consumption_id"`
+	AllocationID      string         `json:"allocation_id"`
+	OperationKey      string         `json:"operation_key"`
+	AttemptID         string         `json:"attempt_id"`
+	ConsumedAt        time.Time      `json:"consumed_at"`
+	Sequence          int64          `json:"sequence"`
+	Digest            string         `json:"digest"`
+	ReceiptRef        string         `json:"receipt_ref,omitempty"`
+	ExecutionIndex    int            `json:"execution_index,omitempty"`
+	RepeatOfAttemptID string         `json:"repeat_of_attempt_id,omitempty"`
+	ResourceUsage     *ResourceUsage `json:"resource_usage,omitempty"`
 }
 
 type ConsumptionBatchBody struct {
@@ -225,9 +240,17 @@ type ConsumptionBatchBody struct {
 	Consumptions []ConsumptionBody `json:"consumptions"`
 }
 
+type ConsumptionAckResult struct {
+	ConsumptionID string `json:"consumption_id"`
+	Status        string `json:"status"`
+	Reason        string `json:"reason,omitempty"`
+}
+
 type ConsumptionAckBody struct {
-	SatelliteID          string `json:"satellite_id"`
-	AckedThroughSequence int64  `json:"acked_through_sequence"`
+	SatelliteID          string                 `json:"satellite_id"`
+	AckedThroughSequence int64                  `json:"acked_through_sequence"`
+	Results              []ConsumptionAckResult `json:"results,omitempty"`
+	Reason               string                 `json:"reason,omitempty"`
 }
 
 var MessageTypes = map[string]bool{

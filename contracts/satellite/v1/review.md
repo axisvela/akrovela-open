@@ -30,6 +30,32 @@ not external sign-off, runtime conformance or a security certification.
    batch 100.
 8. First implementation is Go.
 
+## F4a Multi-Execution Budget Amendment - 2026-11-10
+
+1. Compatibility is additive and optional: `pre_release` gains
+   `execution_model`, `resource_budget_mode`, `ack_profile`,
+   `exhaustion_profile` and `capability_source`; absent values keep the v1
+   defaults `single_use`, `per_execution`, `per_consumption`, `infer` and
+   `persist_last_hello`. Existing required fields, envelopes and messages are
+   unchanged.
+2. Consumption identity is `(satellite_id, consumption_id)` plus the new
+   `(satellite_id, allocation_id, execution_index)`. `execution_index` is an
+   integer `>= 1` and defaults to 1. `repeat_of_attempt_id` uses the attempt
+   pattern and is required for `repeat_attempt` indices greater than 1.
+   `resource_usage` carries the four numeric fields `duration_ms`,
+   `goal_distance_m`, `path_length_m` and `payload_bytes`.
+3. `consumption_ack` may carry a per-item `results` array
+   (`consumption_id`, `status` of `accepted|duplicate|rejected`, optional
+   `reason`) and a batch-level `reason`; `acked_through_sequence` remains the
+   contiguous accepted prefix.
+4. The C fixture guard is semantic, not schema-expressed: `repeat_attempt` is
+   only valid with `contract_mode=fixture`. The schema constrains
+   `contract_mode` to `fixture`, and `test_repeat_release_requires_fixture`
+   asserts the semantic rule using `pre-release-repeat-live.json`.
+5. Canonical scope is evidence-only. This amendment does not alter core
+   behavior, canonical tables, attempts or operation state; repeat evidence
+   stays in the offline and satellite receipt ledgers.
+
 ## Ownership
 
 AKROVELA owns coordinator admission, epoch, command journal and canonical

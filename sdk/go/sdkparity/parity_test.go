@@ -130,6 +130,7 @@ func TestSatelliteParity(t *testing.T) {
 		"ResumeResultBody":     satellitev1.ResumeResultBody{},
 		"ReceiptAckBody":       satellitev1.ReceiptAckBody{},
 		"ResourceBudget":       satellitev1.ResourceBudget{},
+		"ResourceUsage":        satellitev1.ResourceUsage{},
 		"PreReleaseBody":       satellitev1.PreReleaseBody{},
 		"PreReleaseAckBody":    satellitev1.PreReleaseAckBody{},
 		"ConsumptionBody":      satellitev1.ConsumptionBody{},
