@@ -72,6 +72,23 @@ class SatelliteContractTests(unittest.TestCase):
         invalid = load(FIXTURES / 'invalid' / 'pre-release-repeat-live.json')
         self.assertFalse(self.valid_body(invalid))
 
+    def test_pre_release_count_budget_maximum(self):
+        body = self.defs['PreReleaseBody']
+        self.assertEqual(body['properties']['count_budget']['maximum'], 10)
+        document = load(FIXTURES / 'invalid' / 'pre-release-count-budget-eleven.json')
+        schema_name = document.pop('_schema')
+        with self.assertRaises(SchemaError):
+            validate(document, self.defs[schema_name], self.spec)
+
+    def test_receipt_evidence_fields(self):
+        document = load(FIXTURES / 'valid' / 'receipt-batch-evidence.json')
+        schema_name = document.pop('_schema')
+        validate(document, self.defs[schema_name], self.spec)
+        receipt = document['body']['receipts'][0]
+        self.assertEqual(receipt['receipt_type'], 'evidence')
+        self.assertEqual(receipt['execution_index'], 2)
+        self.assertEqual(receipt['repeat_of_attempt_id'], receipt['attempt_id'])
+
     def test_consumption_indexed_fields(self):
         body = load(FIXTURES / 'valid' / 'consumption-batch-indexed.json')['body']
         self.assertEqual(body['consumptions'][0]['execution_index'], 2)

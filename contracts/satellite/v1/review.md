@@ -55,6 +55,13 @@ not external sign-off, runtime conformance or a security certification.
 5. Canonical scope is evidence-only. This amendment does not alter core
    behavior, canonical tables, attempts or operation state; repeat evidence
    stays in the offline and satellite receipt ledgers.
+6. Receipts carry optional `execution_index` (integer `>= 1`) and
+   `repeat_of_attempt_id` (attempt pattern). Offline pre-release receipts are
+   `receipt_type=evidence`; repeat indices greater than 1 always set
+   `repeat_of_attempt_id`. Such receipts are imported into the satellite receipt
+   ledger only and never mint canonical receipts, outbox entries or counters.
+7. `count_budget` is bounded to `1..10` in this fixture slice; the invalid
+   `pre-release-count-budget-eleven.json` fixture asserts the bound.
 
 ## Ownership
 

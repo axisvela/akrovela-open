@@ -202,7 +202,9 @@
               "receipt_type": {"type": "string", "enum": ["admission", "execution", "cancellation", "evidence", "repair"]},
               "sequence": {"type": "integer", "minimum": 1},
               "digest": {"$ref": "#/$defs/Digest"},
-              "emitted_at": {"$ref": "#/$defs/DateTime"}
+              "emitted_at": {"$ref": "#/$defs/DateTime"},
+              "execution_index": {"type": "integer", "minimum": 1},
+              "repeat_of_attempt_id": {"type": "string", "pattern": "^attempt:[A-Za-z0-9._~-]+$"}
             }
           }
         }
@@ -360,7 +362,7 @@
         "idempotency_retention_seconds": {"type": "integer", "minimum": 1, "maximum": 31536000},
         "dispatch_not_after": {"$ref": "#/$defs/DateTime"},
         "contract_mode": {"const": "fixture"},
-        "count_budget": {"type": "integer", "minimum": 1, "maximum": 1000},
+        "count_budget": {"type": "integer", "minimum": 1, "maximum": 10},
         "resource_budget": {"$ref": "#/$defs/ResourceBudget"},
         "execution_model": {"type": "string", "enum": ["single_use", "satellite_attempts", "repeat_attempt"]},
         "resource_budget_mode": {"type": "string", "enum": ["per_execution", "aggregate"]},
