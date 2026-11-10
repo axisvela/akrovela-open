@@ -81,6 +81,27 @@ escalation. No component may substitute its fact for another's authority.
 - Zero fencing tokens are rejected by the contract.
 - Simulation, ROS action state, receipts and Mission completion remain distinct.
 
+## F5 amendment (post-attempt observations)
+
+This amendment does not widen the v1 wire schema. It makes the existing
+receipt conditions explicit and adds one negative fixture.
+
+- Submit `observation_refs` stays empty. Observations are not referenced at
+  admission; they bind to the attempt after claim, through `attempt_id` and
+  `execution_epoch` in the receipt's observation subject.
+- `effect_status=verified` requires `execution_status=completed`,
+  `verifier.result=verified`, an independent verifier result and at least one
+  accepted observation. Every observation recorded on a verified effect must
+  have `freshness_decision=accepted`. Invalid examples:
+  `receipt-verified-with-unknown-verifier.json` and
+  `receipt-verified-with-stale-observation.json`.
+- Missing, stale, replayed, wrong-robot or wrong-operation observations leave
+  the effect `unknown`. Failures map to `unknown`, not success, unless a valid
+  observation shows the robot outside tolerance. F5a enforces an accepted
+  observation with a non-empty `subject`; full observation-envelope, freshness
+  arithmetic, clock correspondence and target-digest binding validation remain
+  F5b gates.
+
 ## Residual Risks
 
 | Risk | Effect | Next gate |
