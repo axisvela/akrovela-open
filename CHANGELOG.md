@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Add the reviewed `v1` delegation contract for the KINETOVELA-to-AKROVELA
+  bounded operation envelope: schema, valid `fixture`/`live` fixtures, negative
+  fixtures and public usage. The current adapter accepts `fixture` mode only;
+  `live` is published and reviewed for Phase 3 but not accepted yet.
+- Add the live admission receipt fixture to the operation contract and record the
+  live receipt label in the operation review.
+- Add the delegation review record, contract index, public docs and changelog
+  entry. No live integration, real verifier or physical effect is claimed.
+
 ## 0.4.0 - 2026-11-11
 
 - Align the public version with core `0.4.0`. No public contract or SDK behavior

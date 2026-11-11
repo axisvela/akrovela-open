@@ -71,5 +71,11 @@ class DelegationContractTests(unittest.TestCase):
             with self.subTest(fixture=path.name):
                 self.assertNotEqual([], list(self.validator.iter_errors(json.loads(path.read_text()))))
 
+    def test_review_record_exists(self):
+        text = (ROOT / 'contracts/delegation/v1/review.md').read_text()
+        self.assertIn('## Ownership', text)
+        self.assertIn('## Negative and Fault Cases', text)
+        self.assertIn('not external', text.lower())
+
 if __name__ == '__main__':
     unittest.main()
