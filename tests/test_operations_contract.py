@@ -321,6 +321,15 @@ class OperationsContractTests(unittest.TestCase):
         self.assertIn('confirmation_source', receipt['properties'])
         self.assertIn('allOf', receipt)
 
+    def test_live_admission_receipt_is_label_only(self):
+        receipt = load(FIXTURES / 'valid' / 'receipt-live-admission.json')
+        self.assertEqual(receipt['receipt_type'], 'admission')
+        self.assertEqual(receipt['contract_mode'], 'live')
+        self.assertEqual(receipt['effect_status'], 'not_evaluated')
+        self.assertNotIn('verifier', receipt)
+        self.assertNotIn('observations', receipt)
+        self.assertNotIn('executor_facts', receipt)
+
     def test_valid_fixtures(self):
         schema_names = {
             'submit-navigate': 'SubmitOperationRequest',

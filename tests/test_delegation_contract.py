@@ -17,10 +17,48 @@ REQUIRED = [
     'resource_limits', 'idempotency_retention_seconds',
 ]
 
+DEFS = [
+    'OperationKey', 'AttemptId', 'ObservationId', 'Digest', 'Scope', 'Target',
+    'Validity', 'ResourceLimits', 'ObservationSubject', 'ObservationReference',
+    'NavigateToPosePayload',
+]
+
+INVALID_REASONS = {
+    'delegated-operation-missing-delegation-id': ('required', ['delegation_id']),
+    'delegated-operation-wrong-schema-version': ('const', ['schema_version']),
+    'delegated-operation-bad-contract-mode': ('enum', ['contract_mode']),
+    'delegated-operation-zero-fence': ('minimum', ['fencing_token']),
+    'delegated-operation-missing-mission-ref': ('required', ['mission_ref']),
+    'delegated-operation-missing-expected-effect': ('required', ['expected_effect']),
+}
+
+
+def rewrite_component_refs(value):
+    if isinstance(value, dict):
+        rewritten = {}
+        for key, child in value.items():
+            prefix = '#/components/schemas/'
+            if key == '$ref' and isinstance(child, str) and child.startswith(prefix):
+                rewritten[key] = '#/$defs/' + child[len(prefix):]
+            else:
+                rewritten[key] = rewrite_component_refs(child)
+        return rewritten
+    if isinstance(value, list):
+        return [rewrite_component_refs(item) for item in value]
+    return value
+
+
+def error_path(error):
+    path = list(error.absolute_path)
+    if error.validator == 'required':
+        path.append(error.message.split("'")[1])
+    return path
+
+
 class DelegationContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.schema = json.loads(SCHEMA.read_text())
+        cls.schema = json.loads(SCHEMA.read_text(encoding='utf-8'))
         cls.validator = Draft202012Validator(cls.schema, format_checker=FormatChecker())
 
     def test_identity_and_mode(self):
@@ -30,19 +68,15 @@ class DelegationContractTests(unittest.TestCase):
         self.assertEqual(set(REQUIRED), set(self.schema['required']))
 
     def test_defs_match_operations_components(self):
-        operations = json.loads(OPERATIONS.read_text())['components']['schemas']
-        objects = ['Scope', 'Target', 'Validity', 'ResourceLimits', 'NavigateToPosePayload', 'ObservationReference', 'ObservationSubject']
-        strings = ['ObservationId', 'Digest']
-        for name in objects:
+        operations = json.loads(OPERATIONS.read_text(encoding='utf-8'))['components']['schemas']
+        for name in DEFS:
             with self.subTest(schema=name):
                 self.assertIn(name, self.schema['$defs'])
-                self.assertEqual(set(operations[name]['required']), set(self.schema['$defs'][name]['required']))
-                self.assertEqual(set(operations[name]['properties']), set(self.schema['$defs'][name]['properties']))
-        for name in strings:
-            with self.subTest(schema=name):
-                self.assertIn(name, self.schema['$defs'])
-                self.assertEqual(operations[name]['type'], self.schema['$defs'][name]['type'])
-                self.assertEqual(operations[name].get('pattern'), self.schema['$defs'][name].get('pattern'))
+                self.assertIn(name, operations)
+                self.assertEqual(
+                    rewrite_component_refs(operations[name]),
+                    self.schema['$defs'][name],
+                )
 
     def test_local_refs_only(self):
         def walk(value):
@@ -62,17 +96,25 @@ class DelegationContractTests(unittest.TestCase):
         self.assertGreaterEqual(len(paths), 2)
         for path in paths:
             with self.subTest(fixture=path.name):
-                self.assertEqual([], list(self.validator.iter_errors(json.loads(path.read_text()))))
+                document = json.loads(path.read_text(encoding='utf-8'))
+                self.assertEqual([], list(self.validator.iter_errors(document)))
 
     def test_invalid_fixtures(self):
         paths = sorted((FIXTURES / 'invalid').glob('*.json'))
-        self.assertGreaterEqual(len(paths), 6)
+        self.assertEqual(set(INVALID_REASONS), {path.stem for path in paths})
         for path in paths:
             with self.subTest(fixture=path.name):
-                self.assertNotEqual([], list(self.validator.iter_errors(json.loads(path.read_text()))))
+                document = json.loads(path.read_text(encoding='utf-8'))
+                errors = list(self.validator.iter_errors(document))
+                self.assertNotEqual([], errors)
+                first = errors[0]
+                self.assertEqual(
+                    (first.validator, error_path(first)),
+                    INVALID_REASONS[path.stem],
+                )
 
     def test_review_record_exists(self):
-        text = (ROOT / 'contracts/delegation/v1/review.md').read_text()
+        text = (ROOT / 'contracts/delegation/v1/review.md').read_text(encoding='utf-8')
         self.assertIn('## Ownership', text)
         self.assertIn('## Negative and Fault Cases', text)
         self.assertIn('not external', text.lower())

@@ -15,6 +15,7 @@ not external sign-off, runtime conformance or live integration evidence.
 | Review method | In-repository review of contract, fixtures and ownership boundaries |
 | Reviewed `akrovela` core revision | `af16a010ae299f01247d8a5c389fd17815bc721e` |
 | Reviewed `akrovela-open` revision | `8f01dbd9f5589e63310255a07a5d7ed2ee258fbc` |
+| Reviewed `akrovela-open` docs/review revision | `ff45b60` |
 | Upstream KINETOVELA core revision | `545023997bff5f6287a80fe5817c1782e52ae570` |
 
 The contract line is `v1`; the product version tracks the `0.4.0` release. The
@@ -22,7 +23,10 @@ reviewed core revision is the `akrovela` source tree that contains the controlle
 delegation adapter. The delegation references the KINETOVELA Mission and effect
 contracts reviewed at KINETOVELA core `545023997bff5f6287a80fe5817c1782e52ae570`;
 AKROVELA does not import KINETOVELA internals. This record is evidence for an
-in-repository review only.
+in-repository review only. The cited `8f01dbd9f5589e63310255a07a5d7ed2ee258fbc`
+revision is the contract-artifact revision: it contains the delegation schema,
+fixtures and live admission receipt. `ff45b60` adds this review record and public
+documentation and does not change those contract artifacts.
 
 ## Ownership
 
@@ -56,11 +60,11 @@ does not widen the wire schema and does not provide live integration evidence.
 | Bad contract mode value | Reject as invalid | `delegated-operation-bad-contract-mode.json` |
 | Zero or negative fence | Reject as invalid | `delegated-operation-zero-fence.json`; adapter rejects `< 1` |
 | Missing mission reference | Reject as invalid | `delegated-operation-missing-mission-ref.json` |
-| Missing assignment reference | Reject as invalid | Schema pattern and adapter reference check |
-| Missing lease reference | Reject as invalid | Schema pattern and adapter reference check |
-| Missing safety-envelope reference | Reject as invalid | Schema pattern and adapter reference check |
-| Missing authority reference | Reject as invalid | Schema pattern and adapter reference check |
-| Missing approval reference | Reject as invalid | Schema pattern and adapter reference check |
+| Missing assignment reference | Reject as invalid | Top-level `required`; adapter reference check reviewed, not verified |
+| Missing lease reference | Reject as invalid | Top-level `required`; adapter reference check reviewed, not verified |
+| Missing safety-envelope reference | Reject as invalid | Top-level `required`; adapter reference check reviewed, not verified |
+| Missing authority reference | Reject as invalid | Top-level `required`; adapter reference check reviewed, not verified |
+| Missing approval reference | Reject as invalid | Top-level `required`; adapter reference check reviewed, not verified |
 | Missing expected effect | Reject as invalid | `delegated-operation-missing-expected-effect.json` |
 | Oversized expected effect | Reject as invalid | Schema `maxLength` of 512; adapter length check |
 | Scope mismatch with the authenticated principal | Reject with `forbidden_scope`; no cross-tenant admission | Schema scope and adapter authorization check |
@@ -78,7 +82,7 @@ does not widen the wire schema and does not provide live integration evidence.
 | No live KINETOVELA Mission contract | Live delegation is blocked | KINETOVELA public Mission and effect-admission surfaces |
 | No runtime conformance or live integration | Fixture and review evidence only | Phase 3 server gate and live integration evidence |
 | No real verifier or physical effect | No execution or effect claim | Owning verifier and execution gates |
-| Local test validator is a JSON Schema subset | Some semantic coverage is not enforced by the suite | External `jsonschema` checks before relying on the suite alone |
+| Suite uses full `jsonschema.Draft202012Validator`; it does not prove adapter or runtime conformance | Contract validation can pass while adapter or live behavior differs | Adapter tests and Phase 3 runtime integration evidence |
 
 ## Decision
 
