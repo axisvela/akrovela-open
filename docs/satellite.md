@@ -1,6 +1,6 @@
 # Satellite Command Protocol v1
 
-**Status:** public contract, product `0.3.0`, protocol `v1`, fixture mode only.
+**Status:** public contract, product `0.4.0`, protocol `v1`, fixture mode only.
 This is not an implementation and claims no live operation, ROS, effect or
 hardware behavior.
 

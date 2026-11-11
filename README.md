@@ -8,7 +8,7 @@ Public integration surface for AKROVELA, a governed edge/site execution platform
 | [akrovela](https://github.com/axisvela/akrovela) | Go/PostgreSQL core | AGPL-3.0-only |
 | [akrovela-ee](https://github.com/axisvela/akrovela-ee) | Enterprise extensions and internal product documentation | Enterprise |
 
-`0.3.0`, bootstrap maturity C. Operational endpoints, a Go version
+`0.4.0`, bootstrap maturity C. Operational endpoints, a Go version
 client and a reviewed v1 local operation/receipt contract exist. No
 executable-operation implementation, SBRP implementation, remote stop guarantee
 or verified robot support is claimed. URLs are target addresses; no package or

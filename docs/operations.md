@@ -1,6 +1,6 @@
 # Local Operation and Receipt Contract v1
 
-**Status:** public contract, product `0.3.0`, contract `v1`. The contract is
+**Status:** public contract, product `0.4.0`, contract `v1`. The contract is
 reviewed for integration; it is not an implementation and no executor, database
 schema or live KINETOVELA integration is claimed.
 

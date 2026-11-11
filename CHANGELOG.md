@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 - 2026-11-11
+
+- Align the public version with core `0.4.0`. No public contract or SDK behavior
+  change; the reviewed v1 operation and satellite contracts are carried forward.
+  Core `0.4.0` adds F5b verifier and bridge state durability, optional verifier
+  shared-token auth and service-level fake end-to-end coverage without a public
+  wire change.
+
 ## 0.3.0 - 2026-11-11
 
 - Align the public version with core `0.3.0`. No public contract or SDK behavior
