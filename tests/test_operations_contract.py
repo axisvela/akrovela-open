@@ -330,6 +330,7 @@ class OperationsContractTests(unittest.TestCase):
             'cancel-response': 'CancelResponse',
             'receipt': 'Receipt',
             'receipt-admission-rejected': 'Receipt',
+            'receipt-live-admission': 'Receipt',
         }
         for path in sorted((FIXTURES / 'valid').glob('*.json')):
             validate(load(path), self.schemas[schema_names[path.stem]], self.spec)

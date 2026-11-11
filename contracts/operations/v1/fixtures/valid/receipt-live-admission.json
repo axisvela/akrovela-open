@@ -1,0 +1,17 @@
+{
+  "receipt_id": "receipt:0192f201-0a1b-7c2d-8e3f-4a5b6c7d8e9f",
+  "receipt_sequence": 1,
+  "receipt_type": "admission",
+  "operation_key": "op:0192f0f2-7d6f-7c2a-9d1e-2b6f0f7a9c31",
+  "emitted_at": "2026-11-11T10:00:00Z",
+  "payload_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "binding_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "fencing_token": 42,
+  "contract_mode": "live",
+  "admission_status": "accepted",
+  "execution_status": "not_started",
+  "cancellation_status": "not_requested",
+  "effect_status": "not_evaluated",
+  "evidence_refs": ["receipt:live-admission-contract-fixture"],
+  "receipt_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+}

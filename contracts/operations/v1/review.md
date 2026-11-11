@@ -107,6 +107,17 @@ receipt conditions explicit and adds one negative fixture.
   arithmetic, clock correspondence and target-digest binding validation remain
   F5b gates.
 
+## Live Receipt Label
+
+`contract_mode=live` is an accepted label. It does not by itself widen the
+contract or add runtime evidence. A live `effect_status=verified` receipt still
+requires a verified independent verifier and accepted non-simulated observations;
+the label does not substitute for that evidence. A live admission receipt
+(`receipt_type=admission`, `effect_status=not_evaluated`) records admission only
+and does not claim an execution, a verifier result or a physical effect, as shown
+by `fixtures/valid/receipt-live-admission.json`. Live KINETOVELA delegation
+remains a Phase 3 behavior and is blocked until its owning gates produce evidence.
+
 ## Residual Risks
 
 | Risk | Effect | Next gate |

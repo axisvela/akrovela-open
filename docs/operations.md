@@ -126,6 +126,19 @@ Simulated observations remain `state_label=simulated`; a live receipt with
 executor, makes the final freshness and arrival decision. A passing simulation is
 not hardware evidence.
 
+## Live Receipt Label
+
+`contract_mode=live` is a label, not execution evidence. A live receipt with
+`effect_status=verified` still requires a verified independent verifier and
+accepted non-simulated observations. A live admission receipt
+(`receipt_type=admission`, `effect_status=not_evaluated`) records admission only
+and claims no execution, verifier result or physical effect; see
+[receipt-live-admission.json](../contracts/operations/v1/fixtures/valid/receipt-live-admission.json).
+The delegation contract for KINETOVELA is
+[delegated-operation.schema.json](../contracts/delegation/v1/delegated-operation.schema.json);
+live KINETOVELA delegation remains a Phase 3 behavior, not a property of this
+label.
+
 ## Security Validation
 
 The review record lists the negative and fault cases that must reject or block:
