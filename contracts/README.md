@@ -2,7 +2,7 @@
 
 | Contract | Status | Scope |
 | --- | --- | --- |
-| [bootstrap.openapi.json](bootstrap.openapi.json) | `0.4.0` | Health, readiness and version only |
+| [bootstrap.openapi.json](bootstrap.openapi.json) | `0.5.0` | Health, readiness and version only |
 | [operations/v1/operations.openapi.json](operations/v1/operations.openapi.json) | `v1`, reviewed | Local operation submit/query/cancel/receipt protocol |
 | [delegation/v1/delegated-operation.schema.json](delegation/v1/delegated-operation.schema.json) | `v1`, reviewed | KINETOVELA-to-AKROVELA delegated operation |
 

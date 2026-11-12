@@ -9,7 +9,7 @@ not external sign-off, runtime conformance or live integration evidence.
 | --- | --- |
 | Contract | `contracts/delegation/v1/delegated-operation.schema.json` |
 | Contract line | `v1` |
-| Product version | `0.4.0` |
+| Product version | `0.5.0` |
 | Consumer | KINETOVELA live delegation |
 | Maintainer | AKROVELA maintainers |
 | Review method | In-repository review of contract, fixtures and ownership boundaries |
@@ -18,7 +18,7 @@ not external sign-off, runtime conformance or live integration evidence.
 | Reviewed `akrovela-open` docs/review revision | `ff45b60` |
 | Upstream KINETOVELA core revision | `545023997bff5f6287a80fe5817c1782e52ae570` |
 
-The contract line is `v1`; the product version tracks the `0.4.0` release. The
+The contract line is `v1`; the product version tracks the `0.5.0` release. The
 reviewed core revision is the `akrovela` source tree that contains the controlled
 delegation adapter. The delegation references the KINETOVELA Mission and effect
 contracts reviewed at KINETOVELA core `545023997bff5f6287a80fe5817c1782e52ae570`;

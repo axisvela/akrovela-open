@@ -1,6 +1,6 @@
 # KINETOVELA Delegated Operation Contract v1
 
-**Status:** public contract, product `0.4.0`, contract `v1`. The contract is
+**Status:** public contract, product `0.5.0`, contract `v1`. The contract is
 reviewed for integration; it is not an implementation. No live KINETOVELA
 integration, ROS 2 execution or physical effect is claimed.
 

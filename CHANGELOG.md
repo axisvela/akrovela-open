@@ -1,7 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.5.0 - 2026-11-11
 
+- Align the public version with core `0.5.0`. The reviewed v1 operation,
+  satellite and delegation contracts are carried forward; core adds the
+  KINETOVELA live delegation components without a public wire change to the
+  existing operation/receipt contract.
 - Add the reviewed `v1` delegation contract for the KINETOVELA-to-AKROVELA
   bounded operation envelope: schema, valid `fixture`/`live` fixtures, negative
   fixtures and public usage. The current adapter accepts `fixture` mode only;
