@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.0 - 2026-11-13
+
+- Align the public version with core `0.6.0`. The reviewed v1 operation,
+  satellite and delegation contracts are carried forward; there is no public
+  operation, receipt, satellite or delegation wire change.
+- Core `0.6.0` adds PostgreSQL Mission control-plane persistence, cursor
+  pagination and durable delegation state; the KINETOVELA cursor contract is
+  published in `KINETOVELA-open`.
+- No production identity, offline guarantee, ROS 2, hardware or physical-effect
+  claim is added.
+
 ## 0.5.0 - 2026-11-11
 
 - Align the public version with core `0.5.0`. The reviewed v1 operation,

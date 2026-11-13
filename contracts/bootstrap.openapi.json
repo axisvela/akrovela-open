@@ -1,6 +1,6 @@
 {
   "openapi": "3.1.0",
-  "info": {"title": "AKROVELA Bootstrap API", "version": "0.5.0", "description": "Local operational endpoints only; no execution API."},
+  "info": {"title": "AKROVELA Bootstrap API", "version": "0.6.0", "description": "Local operational endpoints only; no execution API."},
   "paths": {
     "/healthz": {"get": {"operationId": "health", "responses": {
       "200": {"description": "Process live", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Health"}}}},
