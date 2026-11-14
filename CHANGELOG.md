@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.0 - 2026-11-15
+
+- Align the public version with core `0.7.0`. The reviewed v1 operation,
+  satellite and delegation contracts are carried forward; there is no public
+  operation, receipt, satellite or delegation wire change.
+- Core `0.7.0` adds TPM-backed offline device evidence, one-time AK/EK
+  enrollment binding, a TPM-resident device signing key, one-time verifier
+  challenges, Roughtime, offline deployment preflight and satellite
+  offline-runtime grant/parent-fact persistence.
+- This alignment adds no production device trust, offline guarantee, ROS 2,
+  hardware or physical-effect claim.
+
 ## 0.6.0 - 2026-11-13
 
 - Align the public version with core `0.6.0`. The reviewed v1 operation,
