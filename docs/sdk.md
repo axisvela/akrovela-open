@@ -1,4 +1,4 @@
-# Public Go SDK
+﻿# Public Go SDK
 
 The Go SDK lives under `sdk/go` as module
 `github.com/axisvela/akrovela-open/sdk/go`. It is dependency-free and does not
@@ -7,7 +7,7 @@ import AKROVELA core, EE or other product internals.
 | Package | Contract | Stability |
 | --- | --- | --- |
 | `akrovela` (root) | `/version` client | Reviewed, minimal |
-| `operationsv1` | `contracts/operations/v1/operations.openapi.json` | Reviewed types and strict JSON codec |
+| `operationsv1` | `contracts/operations/v1/operations.openapi.json` | Reviewed types, strict JSON codec and HTTP client |
 | `satellitev1` | `contracts/satellite/v1/satellite.schema.json` | Reviewed types and strict JSON codec |
 | `offlineadmissionv1` | `contracts/satellite/v1/offline-admission.schema.json` | **Experimental**: contract status is proposed |
 
@@ -16,7 +16,7 @@ import AKROVELA core, EE or other product internals.
 - Provides Go types mirroring the public JSON fields.
 - `Decode`, `DecodeEnvelope` and `DecodeBody[T]` reject unknown fields, trailing
   data and wrong protocol/message identifiers.
-- `Encode`/`EncodeEnvelope` marshal the same types.
+- `Encode`/`EncodeEnvelope` marshal the same types.\n- `operationsv1.Client` calls the reviewed operation submit/query/cancel/receipt\n  endpoints with bearer authentication and typed error mapping.
 
 ## What It Does Not Do
 
@@ -39,8 +39,10 @@ subject to the contract owner and consumer validation. Date-time fields use Go
 
 ```go
 import (
+    "context"
     "os"
 
+    operationsv1 "github.com/axisvela/akrovela-open/sdk/go/operationsv1"
     satellitev1 "github.com/axisvela/akrovela-open/sdk/go/satellitev1"
 )
 
@@ -50,6 +52,9 @@ if err != nil {
     return err
 }
 submit, err := satellitev1.DecodeBody[satellitev1.SubmitBody](envelope)
+
+client := operationsv1.NewClient("http://127.0.0.1:2046", "local-token")
+view, err := client.Get(context.Background(), "op:example")
 ```
 
 ## Verification
@@ -73,3 +78,4 @@ but must be documented in `CHANGELOG.md` and reflected in fixture tests.
   notes that exclude production/device/enablement claims.
 
 No tag or registry availability is currently claimed.
+

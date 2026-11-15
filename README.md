@@ -1,4 +1,4 @@
-# AKROVELA Open
+﻿# AKROVELA Open
 
 Public integration surface for AKROVELA, a governed edge/site execution platform.
 
@@ -37,3 +37,4 @@ Public usage: [docs/README.md](docs/README.md),
 Apache-2.0 covers this repository's original source, not imported core binaries.
 Future release bundles must retain AGPL notices, matching corresponding source,
 SBOM, checksums and third-party licenses. No binaries are currently included.
+

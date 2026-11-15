@@ -1,4 +1,10 @@
-# Changelog
+﻿# Changelog
+
+## Unreleased
+
+- Add an `operationsv1` HTTP client for operation submit/query/cancel/receipts.
+  It maps the reviewed error body and requires caller-supplied digests; it does
+  not compute digests, retry effects or confirm a stop.
 
 ## 0.7.0 - 2026-11-15
 
@@ -85,3 +91,4 @@
 - Add the F4a offline pre-release and consumption messages to the satellite
   contract; coordinator-allocated budgets only, no satellite-local admission.
 - No published SDK package, core binary or execution implementation is claimed.
+
