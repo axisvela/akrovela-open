@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.0 - 2026-11-15
 
 - Add `operationsv1.Client.Wait` to poll until execution reaches a terminal
   status. It does not wait for effect verification or retry effects.
@@ -8,6 +8,9 @@
   execution status.
 - Reject empty operation keys, digests, cancel request IDs and receipt IDs before
   sending a request.
+- Add `-wait` to the runnable operations example submit command.
+- Align the public version with core `0.9.0`; the reviewed wire contracts are
+  carried forward.
 
 ## 0.8.0 - 2026-11-15
 
