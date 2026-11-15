@@ -11,7 +11,9 @@ unimplemented. The v1 local operation/receipt contract is published in
 [operation contract usage](operations.md). It is a reviewed contract, not an
 implemented executor. The bounded KINETOVELA-to-AKROVELA envelope is published in
 `contracts/delegation/v1/delegated-operation.schema.json`; see
-[delegation contract usage](delegation.md). The root `VERSION` and OpenAPI info
+[delegation contract usage](delegation.md). Real ROS 2/Nav2, Gazebo and
+PEIRAVELA external acceptance procedures are in
+[real F5 acceptance](real-f5-acceptance.md). The root `VERSION` and OpenAPI info
 version align at `0.5.0`.
 Go modules start without a major suffix while 0.x; a future API major follows Go
 module versioning. Publishing the nested SDK needs `sdk/go/vX.Y.Z`, separately
