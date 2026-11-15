@@ -4,7 +4,10 @@
 
 - Add an `operationsv1` HTTP client for operation submit/query/cancel/receipts.
   It maps the reviewed error body and requires caller-supplied digests; it does
-  not compute digests, retry effects or confirm a stop.
+  not retry effects or confirm a stop.
+- Add `PayloadDigest`, `BindingDigest` and `FillDigests` JCS helpers to the
+  `operationsv1` SDK. They use RFC 8785 numeric and string canonicalization and
+  are checked against the reviewed operation-binding fixture.
 
 ## 0.7.0 - 2026-11-15
 
