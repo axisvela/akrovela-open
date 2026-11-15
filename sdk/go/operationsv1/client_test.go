@@ -142,3 +142,25 @@ func TestClientWaitHonorsCancellation(t *testing.T) {
 		t.Fatal("wait did not honor cancellation")
 	}
 }
+
+func TestClientSubmitAndWait(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.Method == http.MethodPost && r.URL.Path == "/v1/operations":
+			w.WriteHeader(http.StatusAccepted)
+			_ = json.NewEncoder(w).Encode(OperationView{OperationKey: "op-1", ExecutionStatus: "started"})
+		case r.Method == http.MethodGet && r.URL.Path == "/v1/operations/op-1":
+			_ = json.NewEncoder(w).Encode(OperationView{OperationKey: "op-1", ExecutionStatus: "completed"})
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer server.Close()
+	view, err := NewClient(server.URL, "").SubmitAndWait(context.Background(), SubmitOperationRequest{OperationKey: "op-1"}, time.Millisecond)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if view.ExecutionStatus != "completed" {
+		t.Fatalf("view = %+v", view)
+	}
+}

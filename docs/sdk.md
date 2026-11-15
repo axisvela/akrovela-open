@@ -1,4 +1,4 @@
-﻿# Public Go SDK
+# Public Go SDK
 
 The Go SDK lives under `sdk/go` as module
 `github.com/axisvela/akrovela-open/sdk/go`. It is dependency-free and does not
@@ -69,8 +69,7 @@ request := operationsv1.SubmitOperationRequest{
 if err := operationsv1.FillDigests(&request); err != nil {
     return err
 }
-submitted, err := client.Submit(context.Background(), request)
-final, err := client.Wait(context.Background(), submitted.OperationKey, 500*time.Millisecond)
+final, err := client.SubmitAndWait(context.Background(), request, 500*time.Millisecond)
 ```
 
 ## Verification
@@ -96,6 +95,7 @@ but must be documented in `CHANGELOG.md` and reflected in fixture tests.
   notes that exclude production/device/enablement claims.
 
 No tag or registry availability is currently claimed.
+
 
 
 

@@ -81,6 +81,18 @@ func (c *Client) Submit(ctx context.Context, request SubmitOperationRequest) (Op
 	return view, err
 }
 
+// SubmitAndWait submits one operation and polls until execution is terminal.
+func (c *Client) SubmitAndWait(ctx context.Context, request SubmitOperationRequest, interval time.Duration) (OperationView, error) {
+	view, err := c.Submit(ctx, request)
+	if err != nil {
+		return view, err
+	}
+	if TerminalExecutionStatus(view.ExecutionStatus) {
+		return view, nil
+	}
+	return c.Wait(ctx, view.OperationKey, interval)
+}
+
 func (c *Client) Get(ctx context.Context, operationKey string) (OperationView, error) {
 	var view OperationView
 	err := c.do(ctx, http.MethodGet, "/v1/operations/"+url.PathEscape(operationKey), nil, nil, &view, http.StatusOK)

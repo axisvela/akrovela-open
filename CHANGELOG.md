@@ -1,4 +1,11 @@
-﻿# Changelog
+# Changelog
+
+## Unreleased
+
+- Add `operationsv1.Client.Wait` to poll until execution reaches a terminal
+  status. It does not wait for effect verification or retry effects.
+- Add `operationsv1.Client.SubmitAndWait` to submit and poll to a terminal
+  execution status.
 
 ## 0.8.0 - 2026-11-15
 
@@ -98,5 +105,3 @@
 - Add the F4a offline pre-release and consumption messages to the satellite
   contract; coordinator-allocated budgets only, no satellite-local admission.
 - No published SDK package, core binary or execution implementation is claimed.
-
-
