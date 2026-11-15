@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.10.0 - 2026-11-15
+
+- Align the public version with core `0.10.0`; the reviewed wire contracts are
+  carried forward.
+- Core `0.10.0` adds the TPM trust-profile approval gate, a local device
+  inventory whitelist, approval expiry/revocation enforcement, policy content
+  validation in both preflight commands, simulated counter-floor rejection and
+  expanded simulated F5 fault paths.
+- No public operation, satellite or delegation wire change is added.
+
 ## 0.9.0 - 2026-11-15
 
 - Add `operationsv1.Client.Wait` to poll until execution reaches a terminal
