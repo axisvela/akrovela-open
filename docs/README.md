@@ -1,4 +1,4 @@
-﻿# Public Usage
+# Public Usage
 
 `GET /healthz` reports process liveness; `GET /readyz` reports bootstrap database
 and schema availability; `GET /version` reports product/version/bootstrap stage.
@@ -14,8 +14,9 @@ implemented executor. The bounded KINETOVELA-to-AKROVELA envelope is published i
 [delegation contract usage](delegation.md). Real ROS 2/Nav2, Gazebo and
 PEIRAVELA external acceptance procedures are in
 [real F5 acceptance](real-f5-acceptance.md). The root `VERSION` and OpenAPI info
-version align at `0.7.0`.
+version align at `0.8.0`.
 Go modules start without a major suffix while 0.x; a future API major follows Go
 module versioning. Publishing the nested SDK needs `sdk/go/vX.Y.Z`, separately
 from product root tags; no such tags or registry availability are claimed here.
+
 

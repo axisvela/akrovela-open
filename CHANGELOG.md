@@ -1,6 +1,6 @@
-﻿# Changelog
+# Changelog
 
-## Unreleased
+## 0.8.0 - 2026-11-15
 
 - Add an `operationsv1` HTTP client for operation submit/query/cancel/receipts.
   It maps the reviewed error body and requires caller-supplied digests; it does
@@ -8,6 +8,10 @@
 - Add `PayloadDigest`, `BindingDigest` and `FillDigests` JCS helpers to the
   `operationsv1` SDK. They use RFC 8785 numeric and string canonicalization and
   are checked against the reviewed operation-binding fixture.
+- Add a runnable `examples/operations` command for submit, query, cancel and
+  receipt calls through the public `operationsv1` client.
+- Align the public version with core `0.8.0`; the reviewed operation, satellite
+  and delegation wire contracts are carried forward.
 
 ## 0.7.0 - 2026-11-15
 
@@ -95,5 +99,3 @@
   contract; coordinator-allocated budgets only, no satellite-local admission.
 - No published SDK package, core binary or execution implementation is claimed.
 
-- Add a runnable `examples/operations` command for submit, query, cancel and
-  receipt calls through the public `operationsv1` client.
