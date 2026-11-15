@@ -6,6 +6,8 @@
   status. It does not wait for effect verification or retry effects.
 - Add `operationsv1.Client.SubmitAndWait` to submit and poll to a terminal
   execution status.
+- Reject empty operation keys, digests, cancel request IDs and receipt IDs before
+  sending a request.
 
 ## 0.8.0 - 2026-11-15
 

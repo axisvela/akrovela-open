@@ -54,6 +54,9 @@ func TerminalExecutionStatus(status string) bool {
 // Wait polls until execution reaches a terminal status or the context ends. It
 // does not wait for effect verification and it does not retry a submitted effect.
 func (c *Client) Wait(ctx context.Context, operationKey string, interval time.Duration) (OperationView, error) {
+	if err := requireOperationKey(operationKey); err != nil {
+		return OperationView{}, err
+	}
 	if interval <= 0 {
 		interval = 100 * time.Millisecond
 	}
@@ -76,6 +79,12 @@ func (c *Client) Wait(ctx context.Context, operationKey string, interval time.Du
 }
 
 func (c *Client) Submit(ctx context.Context, request SubmitOperationRequest) (OperationView, error) {
+	if err := requireOperationKey(request.OperationKey); err != nil {
+		return OperationView{}, err
+	}
+	if strings.TrimSpace(request.PayloadDigest) == "" || strings.TrimSpace(request.BindingDigest) == "" {
+		return OperationView{}, fmt.Errorf("operationsv1: payload_digest and binding_digest are required")
+	}
 	var view OperationView
 	err := c.do(ctx, http.MethodPost, "/v1/operations", nil, request, &view, http.StatusAccepted, http.StatusOK)
 	return view, err
@@ -94,18 +103,30 @@ func (c *Client) SubmitAndWait(ctx context.Context, request SubmitOperationReque
 }
 
 func (c *Client) Get(ctx context.Context, operationKey string) (OperationView, error) {
+	if err := requireOperationKey(operationKey); err != nil {
+		return OperationView{}, err
+	}
 	var view OperationView
 	err := c.do(ctx, http.MethodGet, "/v1/operations/"+url.PathEscape(operationKey), nil, nil, &view, http.StatusOK)
 	return view, err
 }
 
 func (c *Client) Cancel(ctx context.Context, operationKey string, request CancelRequest) (CancelResponse, error) {
+	if err := requireOperationKey(operationKey); err != nil {
+		return CancelResponse{}, err
+	}
+	if strings.TrimSpace(request.CancelRequestID) == "" {
+		return CancelResponse{}, fmt.Errorf("operationsv1: cancel request id is required")
+	}
 	var response CancelResponse
 	err := c.do(ctx, http.MethodPost, "/v1/operations/"+url.PathEscape(operationKey)+"/cancel", nil, request, &response, http.StatusAccepted)
 	return response, err
 }
 
 func (c *Client) Receipts(ctx context.Context, operationKey string, afterSequence int64) (ReceiptList, error) {
+	if err := requireOperationKey(operationKey); err != nil {
+		return ReceiptList{}, err
+	}
 	query := url.Values{}
 	if afterSequence > 0 {
 		query.Set("after_sequence", fmt.Sprintf("%d", afterSequence))
@@ -116,9 +137,19 @@ func (c *Client) Receipts(ctx context.Context, operationKey string, afterSequenc
 }
 
 func (c *Client) GetReceipt(ctx context.Context, receiptID string) (Receipt, error) {
+	if strings.TrimSpace(receiptID) == "" {
+		return Receipt{}, fmt.Errorf("operationsv1: receipt id is required")
+	}
 	var receipt Receipt
 	err := c.do(ctx, http.MethodGet, "/v1/receipts/"+url.PathEscape(receiptID), nil, nil, &receipt, http.StatusOK)
 	return receipt, err
+}
+
+func requireOperationKey(operationKey string) error {
+	if strings.TrimSpace(operationKey) == "" {
+		return fmt.Errorf("operationsv1: operation key is required")
+	}
+	return nil
 }
 
 func (c *Client) do(ctx context.Context, method, path string, query url.Values, body, out any, statuses ...int) error {

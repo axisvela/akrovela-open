@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 )
@@ -30,7 +31,7 @@ func TestClientSubmit(t *testing.T) {
 	}))
 	defer server.Close()
 
-	view, err := NewClient(server.URL, "token").Submit(context.Background(), SubmitOperationRequest{OperationKey: "op-1"})
+	view, err := NewClient(server.URL, "token").Submit(context.Background(), SubmitOperationRequest{OperationKey: "op-1", PayloadDigest: "sha256:" + strings.Repeat("0", 64), BindingDigest: "sha256:" + strings.Repeat("1", 64)})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -156,11 +157,43 @@ func TestClientSubmitAndWait(t *testing.T) {
 		}
 	}))
 	defer server.Close()
-	view, err := NewClient(server.URL, "").SubmitAndWait(context.Background(), SubmitOperationRequest{OperationKey: "op-1"}, time.Millisecond)
+	view, err := NewClient(server.URL, "").SubmitAndWait(context.Background(), SubmitOperationRequest{OperationKey: "op-1", PayloadDigest: "sha256:" + strings.Repeat("0", 64), BindingDigest: "sha256:" + strings.Repeat("1", 64)}, time.Millisecond)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if view.ExecutionStatus != "completed" {
 		t.Fatalf("view = %+v", view)
+	}
+}
+
+func TestClientRejectsEmptyFields(t *testing.T) {
+	calls := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		calls++
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+	client := NewClient(server.URL, "")
+	ctx := context.Background()
+	if _, err := client.Submit(ctx, SubmitOperationRequest{}); err == nil {
+		t.Fatal("empty submit request was accepted")
+	}
+	if _, err := client.Get(ctx, ""); err == nil {
+		t.Fatal("empty operation key was accepted")
+	}
+	if _, err := client.Cancel(ctx, "op-1", CancelRequest{}); err == nil {
+		t.Fatal("empty cancel request was accepted")
+	}
+	if _, err := client.Receipts(ctx, "", 0); err == nil {
+		t.Fatal("empty receipts key was accepted")
+	}
+	if _, err := client.GetReceipt(ctx, ""); err == nil {
+		t.Fatal("empty receipt id was accepted")
+	}
+	if _, err := client.Wait(ctx, "", time.Millisecond); err == nil {
+		t.Fatal("empty wait key was accepted")
+	}
+	if calls != 0 {
+		t.Fatalf("empty requests reached the server: %d", calls)
 	}
 }
