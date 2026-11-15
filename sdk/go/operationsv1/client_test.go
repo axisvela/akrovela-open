@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 func TestClientSubmit(t *testing.T) {
@@ -107,5 +108,37 @@ func TestClientMapsAPIError(t *testing.T) {
 func TestClientRequiresBaseURL(t *testing.T) {
 	if _, err := NewClient("", "").Get(context.Background(), "op-1"); err == nil {
 		t.Fatal("empty base URL was accepted")
+	}
+}
+
+func TestClientWait(t *testing.T) {
+	var calls int
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		calls++
+		status := "started"
+		if calls >= 2 {
+			status = "completed"
+		}
+		_ = json.NewEncoder(w).Encode(OperationView{OperationKey: "op-1", ExecutionStatus: status})
+	}))
+	defer server.Close()
+	view, err := NewClient(server.URL, "").Wait(context.Background(), "op-1", time.Millisecond)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if view.ExecutionStatus != "completed" || calls < 2 {
+		t.Fatalf("view = %+v calls=%d", view, calls)
+	}
+}
+
+func TestClientWaitHonorsCancellation(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_ = json.NewEncoder(w).Encode(OperationView{OperationKey: "op-1", ExecutionStatus: "started"})
+	}))
+	defer server.Close()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
+	defer cancel()
+	if _, err := NewClient(server.URL, "").Wait(ctx, "op-1", time.Millisecond); err == nil {
+		t.Fatal("wait did not honor cancellation")
 	}
 }

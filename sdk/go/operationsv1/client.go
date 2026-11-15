@@ -40,6 +40,41 @@ func NewClient(baseURL, token string) *Client {
 	}
 }
 
+// TerminalExecutionStatus reports whether execution will not advance further.
+// Effect status remains separate; unknown execution is not terminal.
+func TerminalExecutionStatus(status string) bool {
+	switch status {
+	case "completed", "failed", "confirmed_no_effect":
+		return true
+	default:
+		return false
+	}
+}
+
+// Wait polls until execution reaches a terminal status or the context ends. It
+// does not wait for effect verification and it does not retry a submitted effect.
+func (c *Client) Wait(ctx context.Context, operationKey string, interval time.Duration) (OperationView, error) {
+	if interval <= 0 {
+		interval = 100 * time.Millisecond
+	}
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for {
+		view, err := c.Get(ctx, operationKey)
+		if err != nil {
+			return view, err
+		}
+		if TerminalExecutionStatus(view.ExecutionStatus) {
+			return view, nil
+		}
+		select {
+		case <-ctx.Done():
+			return view, ctx.Err()
+		case <-ticker.C:
+		}
+	}
+}
+
 func (c *Client) Submit(ctx context.Context, request SubmitOperationRequest) (OperationView, error) {
 	var view OperationView
 	err := c.do(ctx, http.MethodPost, "/v1/operations", nil, request, &view, http.StatusAccepted, http.StatusOK)

@@ -46,6 +46,7 @@ subject to the contract owner and consumer validation. Date-time fields use Go
 import (
     "context"
     "os"
+    "time"
 
     operationsv1 "github.com/axisvela/akrovela-open/sdk/go/operationsv1"
     satellitev1 "github.com/axisvela/akrovela-open/sdk/go/satellitev1"
@@ -69,6 +70,7 @@ if err := operationsv1.FillDigests(&request); err != nil {
     return err
 }
 submitted, err := client.Submit(context.Background(), request)
+final, err := client.Wait(context.Background(), submitted.OperationKey, 500*time.Millisecond)
 ```
 
 ## Verification
@@ -94,5 +96,6 @@ but must be documented in `CHANGELOG.md` and reflected in fixture tests.
   notes that exclude production/device/enablement claims.
 
 No tag or registry availability is currently claimed.
+
 
 

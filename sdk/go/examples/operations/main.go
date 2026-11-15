@@ -1,4 +1,4 @@
-// Command operations exercises the reviewed operation client against a local
+﻿// Command operations exercises the reviewed operation client against a local
 // AKROVELA core. It does not execute a robot command by itself.
 package main
 
@@ -36,6 +36,8 @@ func run(args []string, stdin io.Reader, out io.Writer) error {
 	requestPath := flags.String("request", "", "submit request JSON file, or - for stdin")
 	receiptID := flags.String("receipt", "", "receipt id")
 	after := flags.Int64("after", 0, "receipt after_sequence")
+	interval := flags.Int("interval-ms", 500, "wait poll interval in milliseconds")
+	timeout := flags.Int("timeout-ms", 60000, "wait timeout in milliseconds")
 	cancelID := flags.String("cancel-id", "", "cancel request id")
 	reason := flags.String("reason", "", "cancel reason code")
 	deadline := flags.Int("deadline-ms", 500, "cancel deadline in milliseconds")
@@ -79,6 +81,17 @@ func run(args []string, stdin io.Reader, out io.Writer) error {
 			return err
 		}
 		return writeJSON(out, response)
+	case "wait":
+		if *operation == "" {
+			return errors.New("-operation is required")
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeout)*time.Millisecond)
+		defer cancel()
+		view, err := client.Wait(ctx, *operation, time.Duration(*interval)*time.Millisecond)
+		if err != nil {
+			return err
+		}
+		return writeJSON(out, view)
 	case "receipts":
 		if *operation == "" {
 			return errors.New("-operation is required")
@@ -138,5 +151,7 @@ const usage = `usage:
   operations submit -request request.json [-base-url URL] [-token TOKEN]
   operations get -operation KEY [-base-url URL] [-token TOKEN]
   operations cancel -operation KEY -cancel-id ID [-reason CODE] [-deadline-ms MS]
+  operations wait -operation KEY [-interval-ms MS] [-timeout-ms MS]
   operations receipts -operation KEY [-after SEQUENCE]
   operations receipt -receipt ID`
+
