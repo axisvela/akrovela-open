@@ -76,7 +76,9 @@ submitted, err := client.Submit(context.Background(), request)
 From `sdk/go`: `go test ./...`, `go vet ./...`, `go build ./...`.
 From the repository root: `python -m unittest discover -s tests -v`.
 `sdk/go/sdkparity` compares schema properties with Go json tags in both directions
-so an unreviewed field cannot silently appear in the SDK.
+so an unreviewed field cannot silently appear in the SDK. The runnable
+`examples/operations` command submits, queries, cancels and lists receipts
+through the public client.
 
 ## Versioning and Compatibility
 
@@ -92,4 +94,5 @@ but must be documented in `CHANGELOG.md` and reflected in fixture tests.
   notes that exclude production/device/enablement claims.
 
 No tag or registry availability is currently claimed.
+
 

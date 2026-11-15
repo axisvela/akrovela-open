@@ -95,3 +95,5 @@
   contract; coordinator-allocated budgets only, no satellite-local admission.
 - No published SDK package, core binary or execution implementation is claimed.
 
+- Add a runnable `examples/operations` command for submit, query, cancel and
+  receipt calls through the public `operationsv1` client.
