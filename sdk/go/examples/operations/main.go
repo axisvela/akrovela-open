@@ -1,4 +1,4 @@
-﻿// Command operations exercises the reviewed operation client against a local
+// Command operations exercises the reviewed operation client against a local
 // AKROVELA core. It does not execute a robot command by itself.
 package main
 
@@ -38,6 +38,7 @@ func run(args []string, stdin io.Reader, out io.Writer) error {
 	after := flags.Int64("after", 0, "receipt after_sequence")
 	interval := flags.Int("interval-ms", 500, "wait poll interval in milliseconds")
 	timeout := flags.Int("timeout-ms", 60000, "wait timeout in milliseconds")
+	wait := flags.Bool("wait", false, "wait for terminal execution after submit")
 	cancelID := flags.String("cancel-id", "", "cancel request id")
 	reason := flags.String("reason", "", "cancel reason code")
 	deadline := flags.Int("deadline-ms", 500, "cancel deadline in milliseconds")
@@ -54,6 +55,15 @@ func run(args []string, stdin io.Reader, out io.Writer) error {
 		}
 		if err := operationsv1.FillDigests(&request); err != nil {
 			return err
+		}
+		if *wait {
+			ctx, cancel := context.WithTimeout(ctx, time.Duration(*timeout)*time.Millisecond)
+			defer cancel()
+			view, err := client.SubmitAndWait(ctx, request, time.Duration(*interval)*time.Millisecond)
+			if err != nil {
+				return err
+			}
+			return writeJSON(out, view)
 		}
 		view, err := client.Submit(ctx, request)
 		if err != nil {
@@ -154,4 +164,3 @@ const usage = `usage:
   operations wait -operation KEY [-interval-ms MS] [-timeout-ms MS]
   operations receipts -operation KEY [-after SEQUENCE]
   operations receipt -receipt ID`
-

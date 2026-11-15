@@ -107,3 +107,4 @@
 - Add the F4a offline pre-release and consumption messages to the satellite
   contract; coordinator-allocated budgets only, no satellite-local admission.
 - No published SDK package, core binary or execution implementation is claimed.
+
