@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.11.0 - 2026-11-16
+
+- Align the public version with core `0.11.0`; the reviewed wire contracts are
+  carried forward.
+- Core `0.11.0` adds the F5 Linux simulation prerequisites: a pinned stack
+  manifest and provisioner, a JSONL Gazebo observation exporter with
+  attempt-start binding, a Linux preflight gate and an opt-in cross-product CI
+  E2E. These are component increments, not real ROS 2/Gazebo/Linux or
+  PEIRAVELA acceptance.
+- No public operation, satellite or delegation wire change is added.
+
 ## 0.10.0 - 2026-11-15
 
 - Align the public version with core `0.10.0`; the reviewed wire contracts are
