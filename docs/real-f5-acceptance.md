@@ -96,8 +96,10 @@ cancel response is not a stop confirmation.
 
 ### A4. Start the arrival verifier
 
-The live Gazebo source is not implemented in the current release. For this ROS
-2/Nav2 track use either:
+The verifier consumes strict JSONL observations through
+`AKROVELA_ARRIVAL_OBSERVATION_STREAM`. The live source is the
+`backend/gazeboobserver` exporter (Track B). For a ROS 2/Nav2-only smoke without
+Gazebo, use either:
 
 - `AKROVELA_ARRIVAL_SIMULATED_SOURCE=true` with a pose matching the submitted
   goal (`AKROVELA_ARRIVAL_SIMULATED_X`, `_Y`, `_YAW`), or
@@ -140,8 +142,13 @@ export AKROVELA_NAV2_BRIDGE_URL=http://127.0.0.1:2055
 export AKROVELA_NAV2_BRIDGE_TOKEN="$BRIDGE_TOKEN"
 export AKROVELA_VERIFIER_URL=http://127.0.0.1:2054
 export AKROVELA_VERIFIER_TOKEN="$AKROVELA_ARRIVAL_VERIFIER_TOKEN"
+export AKROVELA_GAZEBO_BINDING_FILE=/var/lib/akrovela/gazebo-binding.json
 ./akrovela-api
 ```
+
+When `AKROVELA_GAZEBO_BINDING_FILE` is set, the API writes the six-field binding
+before the Nav2 adapter submits; the exporter reads it. The standalone
+`akrovela-gazebo-binding` command exists for harnesses that do not run the API.
 
 Submit one operation. The recommended external path is the reviewed
 KINETOVELA delegated-operation contract; the existing cross-product E2E script
@@ -166,8 +173,12 @@ file, verifier response and the exact goal/map/frame values. Sanitize tokens.
 
 ## Track B: Live Gazebo Observation Source
 
-Current gap: `GazeboSource` returns `ErrSourceUnavailable`. A live source must
-implement the observation contract with these fields per observation:
+The verifier's in-process `GazeboSource` remains a fail-closed stub. The
+released live path is `backend/gazeboobserver`: it subscribes to Gazebo ground
+truth, writes strict JSONL observations, and the verifier consumes them through
+`AKROVELA_ARRIVAL_OBSERVATION_STREAM`. The exporter reads the per-attempt
+binding written through `AKROVELA_GAZEBO_BINDING_FILE`. A live source must
+preserve these fields per observation:
 `ObservationID`, `SourceID`, `SourceEpoch`, `Seq`, `RobotRef`, `MapRef`,
 `OperationKey`, `AttemptID`, `ExecutionEpoch`, `TargetDigest`, `ObservedAt`,
 `ReceivedAt`, `X`, `Y`, `Yaw`, `Digest`.
@@ -183,11 +194,21 @@ Required behavior:
    simulation-to-authority offset if used.
 5. Return a content digest for each observation.
 
-Interim verification: use `AKROVELA_ARRIVAL_OBSERVATION_FILE` with recorded
-ground truth and `AKROVELA_ARRIVAL_TRANSFORM_FILE` with `"validated": true`.
-This proves the verifier path, not a live feed. The target digest and attempt
-identity are operation-specific, so a static file is not a substitute for a live
-source in a full run.
+Exporter environment:
+
+```bash
+export AKROVELA_GAZEBO_TOPIC=/world/warehouse-aisle-a/pose/info
+export AKROVELA_GAZEBO_EXPORT_PATH=/var/lib/akrovela/observations.jsonl
+export AKROVELA_ARRIVAL_OBSERVATION_STREAM=/var/lib/akrovela/observations.jsonl
+export AKROVELA_GAZEBO_BINDING_FILE=/var/lib/akrovela/gazebo-binding.json
+python -m gazeboobserver
+```
+
+Recorded-file verification: use `AKROVELA_ARRIVAL_OBSERVATION_FILE` with
+recorded ground truth and `AKROVELA_ARRIVAL_TRANSFORM_FILE` with
+`"validated": true`. This proves the verifier path, not a live feed. The target
+digest and attempt identity are operation-specific, so a static file is not a
+substitute for a live source in a full run.
 
 Acceptance: a matching fresh observation returns `verified`; stale, replayed,
 wrong-source, wrong-binding and unvalidated-transform cases return
@@ -234,6 +255,10 @@ The catalog options carry operation/attempt identity, goal, tolerances and
 Nav2 allowlists. Adjust the goal/map to the actual simulation. If the verifier
 uses the simulated source, set its pose to the same goal.
 
+The catalog is `peiravela/v3` and pins the `warehouse-aisle-a` world/map assets
+under `profiles/robot-lab/suites/nav2/assets/warehouse-aisle-a/`. The assets are
+structural and not Gazebo-validated.
+
 5. Export and independently consume the evidence package:
 
 ```bash
@@ -255,7 +280,9 @@ output, bridge/verifier logs and exact catalog revision.
 
 ## Reporting An External Run
 
-File an issue in `akrovela-open` with:
+File an issue in `akrovela` (the core) with the evidence; `akrovela-open`
+publishes this procedure and the public contracts. Reference the F5 external
+verification issue if one is open. Include:
 
 - repository commit SHAs and versions;
 - host OS, ROS 2, Gazebo, Nav2 and PEIRAVELA versions;
