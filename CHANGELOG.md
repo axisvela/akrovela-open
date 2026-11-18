@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.12.0 - 2026-11-18
+
+- Align the public version with core `0.12.0`; the reviewed wire contracts are
+  carried forward.
+- Core `0.12.0` adds the F5 local development simulation: a bounded
+  `f5-dev-pose` observation writer, an explicit verifier
+  `development-stream` profile, a guarded fixture-only adapter driver, a
+  simulated-bridge completion gate, and a process launcher with adapter fault
+  cases plus a real API/PostgreSQL scope (receipts, duplicate submission,
+  terminal restart, mid-execution crash recovery, auth/scope rejection).
+- No public operation, satellite or delegation wire change is added.
 ## 0.11.0 - 2026-11-16
 
 - Align the public version with core `0.11.0`; the reviewed wire contracts are
