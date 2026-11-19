@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.13.0 - 2026-11-19
+
+- Align the public version with core `0.13.0` after the TPM/offline/satellite
+  boundary move. No wire-contract change; the reviewed contracts are unchanged.
 ## 0.12.0 - 2026-11-18
 
 - Align the public version with core `0.12.0`; the reviewed wire contracts are

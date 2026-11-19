@@ -30,7 +30,7 @@ export AKROVELA_TEST_DATABASE_URL='postgres://user:password@127.0.0.1:5432/akrov
 go run ./cmd/akrovela-dbadmin up
 ```
 
-The migration set is `0001`-`0014`. The application never applies migrations at
+The migration set is `0001`-`0005`. The application never applies migrations at
 startup. Record the commit, Go version, ROS distribution and Gazebo version.
 
 ## Track A: Real ROS 2/Nav2 + rclpy
